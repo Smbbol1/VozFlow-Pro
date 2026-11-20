@@ -1089,7 +1089,14 @@ class VozFlowIME : InputMethodService() {
                 if (label == "?123") symbolPage = 1 else if (label == "=\\<") symbolPage = 2 else symbolPage = 0
                 rebuildKeys()
             }
-            KeyKind.SPACE -> key.setOnTouchListener { _, event -> handleSpaceTouch(event); true }
+                        KeyKind.SPACE -> key.setOnTouchListener { v, event -> 
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> v.isPressed = true
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> v.isPressed = false
+                }
+                handleSpaceTouch(event)
+                true 
+            }
             KeyKind.CONTEXT -> key.setOnClickListener { commit(value) }
             KeyKind.EMOJI -> key.setOnClickListener { performKeyboardHaptic(key); showPopup(key, listOf("😀", "😂", "🥰", "😊", "😉", "😍", "👍", "❤️", "🙏", "🔥")) }
             KeyKind.SYMBOL_FREE -> key.setOnTouchListener { view, event ->
