@@ -1346,9 +1346,9 @@ class VozFlowIME : InputMethodService() {
         pushUndo(removedForUndo, text, leftForUndo, after)
         if (didAutocorrect) exposeUndoForFiveSeconds() else undoAvailableUntil = 0L
         
-        if (shiftState == 1 && value.firstOrNull()?.isLetter() == true) {
+                if (shiftState == 1 && value.firstOrNull()?.isLetter() == true) {
             shiftState = 0
-            // En lugar de reconstruir todo el teclado, solo actualizamos las mayúsculas visualmente
+            // Actualizamos las mayúsculas visualmente sin reconstruir todo
             keyRows?.let { rows ->
                 for (i in 0 until rows.childCount) {
                     val row = rows.getChildAt(i) as? ViewGroup ?: continue
@@ -1362,8 +1362,10 @@ class VozFlowIME : InputMethodService() {
                 }
             }
         }
-        // Si el interruptor de sugerencias está apagado, ni siquiera actualizamos la barra
-        if (prefs.getBoolean("suggestions", true)) {
+        
+        // IMPORTANTE: Solo actualizamos la barra de sugerencias si hay sugerencias activas
+        // Esto ahorra muchísimo procesamiento si tienes las sugerencias desactivadas
+        if (prefs.getBoolean("suggestions", true) && !passwordField) {
             rebuildToolbar()
         }
     }
