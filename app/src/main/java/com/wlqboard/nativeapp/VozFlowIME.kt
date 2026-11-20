@@ -1099,9 +1099,10 @@ class VozFlowIME : InputMethodService() {
             }
             KeyKind.CONTEXT -> key.setOnClickListener { commit(value) }
             KeyKind.EMOJI -> key.setOnClickListener { performKeyboardHaptic(key); showPopup(key, listOf("😀", "😂", "🥰", "😊", "😉", "😍", "👍", "❤️", "🙏", "🔥")) }
-            KeyKind.SYMBOL_FREE -> key.setOnTouchListener { view, event ->
+                        KeyKind.SYMBOL_FREE -> key.setOnTouchListener { view, event ->
                 when (event.actionMasked) {
                     MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true // <-- NUEVO: Resalta la tecla al tocarla
                         freeSymbolLongPressed = false
                         freeSymbolRunnable?.let(main::removeCallbacks)
                         freeSymbolRunnable = Runnable {
@@ -1115,11 +1116,16 @@ class VozFlowIME : InputMethodService() {
                         true
                     }
                     MotionEvent.ACTION_UP -> {
+                        view.isPressed = false // <-- NUEVO: Quita el resaltado al soltar
                         freeSymbolRunnable?.let(main::removeCallbacks)
                         if (!freeSymbolLongPressed) commit(prefs.getString("free_symbol", "@") ?: "@")
                         true
                     }
-                    MotionEvent.ACTION_CANCEL -> { freeSymbolRunnable?.let(main::removeCallbacks); true }
+                    MotionEvent.ACTION_CANCEL -> { 
+                        view.isPressed = false // <-- NUEVO: Quita el resaltado si se cancela el toque
+                        freeSymbolRunnable?.let(main::removeCallbacks); 
+                        true 
+                    }
                     else -> true
                 }
             }
