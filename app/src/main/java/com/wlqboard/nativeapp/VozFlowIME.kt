@@ -1121,8 +1121,9 @@ class VozFlowIME : InputMethodService() {
                 key.setOnLongClickListener { dismissKeyPreview(); showPopup(key, listOf(",", "?", "!", "¿", "¡", "@")); true }
             }
             KeyKind.ACTION -> key.setOnClickListener { performKeyboardHaptic(key); performAction() }
-            KeyKind.CHAR -> {
-                key.setOnClickListener { commit(value) }
+                        KeyKind.CHAR -> {
+                // ELIMINADO el OnClickListener porque ahora se escribe en el OnTouchListener (ACTION_DOWN)
+                // key.setOnClickListener { commit(value) } 
                 val accents = when (value.lowercase()) {
                     "a" -> listOf("á", "à", "â", "ä")
                     "e" -> listOf("é", "è", "ê", "ë")
