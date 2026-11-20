@@ -1240,11 +1240,13 @@ class VozFlowIME : InputMethodService() {
         return key
     }
 
+    private var lastSwipeWordCount = 0
+
     private val deleteRepeat = object : Runnable {
         override fun run() {
             if (!heldDelete) return
-            if (prefs.getBoolean("quick_delete", true)) deleteWord() else deleteOne()
-            deleteHandler.postDelayed(this, 65)
+            if (prefs.getBoolean("quick_delete", true)) deleteWord() else deleteOneTracked()
+            deleteHandler.postDelayed(this, 48)
         }
     }
 
