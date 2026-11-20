@@ -254,7 +254,7 @@ class VozFlowIME : InputMethodService() {
         floatingBottomDrag?.setOnTouchListener(moveCard)
         var startWidthPercent = floatingWidthPercent
         var startHeightPercent = floatingHeightPercent
-        resizeHandle?.setOnTouchListener { _, event ->
+                resizeHandle?.setOnTouchListener { _, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     startWidthPercent = floatingWidthPercent
@@ -264,8 +264,13 @@ class VozFlowIME : InputMethodService() {
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (!floatingMode) return@setOnTouchListener false
-                    floatingWidthPercent = (startWidthPercent + ((event.rawX - downRawX) * 100f / resources.displayMetrics.widthPixels).toInt()).coerceIn(60, 95)
-                    floatingHeightPercent = (startHeightPercent + ((event.rawY - downRawY) * 100f / dp(270)).toInt()).coerceIn(70, 145)
+                    // Calculamos el nuevo ancho y alto sin límites (solo mínimo de 10% para que no desaparezca)
+                    val newWidth = (startWidthPercent + ((event.rawX - downRawX) * 100f / resources.displayMetrics.widthPixels).toInt()).coerceAtLeast(10)
+                    val newHeight = (startHeightPercent + ((event.rawY - downRawY) * 100f / dp(270)).toInt()).coerceAtLeast(10)
+                    
+                    floatingWidthPercent = newWidth
+                    floatingHeightPercent = newHeight
+                    
                     prefs.edit().putInt("floating_width_percent", floatingWidthPercent).putInt("floating_height_percent", floatingHeightPercent).apply()
                     root?.let(::applyKeyboardHeight)
                     rebuildKeys()
