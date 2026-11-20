@@ -1331,38 +1331,53 @@ class VozFlowIME : InputMethodService() {
 
     private fun commit(value: String) {
         val ic = currentInputConnection ?: return
-        val now = SystemClock.uptimeMillis()
-        var text = if (shiftState > 0 && value.length == 1 && value[0].isLetter()) value.uppercase() else value
-        val before = ic.getTextBeforeCursor(300, 0)?.toString().orEmpty()
-        val after = ic.getTextAfterCursor(300, 0)?.toString().orEmpty()
-        val selected = ic.getSelectedText(0)?.toString().orEmpty()
+        val isLetter = value.length == 1 && value[0].isLetter()
+        val isBoundary = value == " " || value in setOf(".", ",", "!", "?", ";", ":")
+        val shouldCheckAutocorrect = isBoundary && !passwordField && prefs.getBoolean("autocorrect", true)
+        val shouldUpdateSuggestions = !passwordField && prefs.getBoolean("suggestions", true) && !listening
+
+        var text = if (shiftState > 0 && isLetter) value.uppercase() else value
+        val before = if (shouldCheckAutocorrect || shouldUpdateSuggestions) {
+            ic.getTextBeforeCursor(120, 0)?.toString().orEmpty()
+        } else {
+            ""
+        }
+        val selected = if (shouldCheckAutocorrect) ic.getSelectedText(0)?.toString().orEmpty() else ""
         var removedForUndo = selected
         var leftForUndo = before
         var didAutocorrect = false
-        if ((value == " " || value in setOf(".", ",", "!", "?", ";", ":")) && prefs.getBoolean("autocorrect", true) && !passwordField) {
+
+        if (shouldCheckAutocorrect) {
             val token = before.takeLastWhile { it.isLetterOrDigit() || it == '\'' || it == '’' }
-            val snippets = readTextSnippets()
-            val expansion = snippets.entries.firstOrNull { it.key.equals(token, ignoreCase = true) }?.value
-            val corrections = mapOf("qeu" to "que", "donde" to "dónde", "tambien" to "también", "mas" to "más", "teh" to "the", "ola" to "hola")
-            val corrected = if (skipNextAutoCorrect) null else expansion ?: corrections[token.lowercase()] ?: SpanishPredictionEngine.autoCorrectCandidate(token, readPersonalWords())
-            if (corrected != null) {
-                ic.deleteSurroundingText(token.length, 0)
-                removedForUndo = token
-                leftForUndo = before.dropLast(token.length)
-                val replacement = if (expansion == null && token.firstOrNull()?.isUpperCase() == true) corrected.replaceFirstChar { it.uppercase() } else corrected
-                text = replacement + if (value == " ") " " else value
-                didAutocorrect = true
+            if (token.isNotEmpty()) {
+                val snippets = snippetsCache()
+                val personal = personalWordsCache()
+                val expansion = snippets.entries.firstOrNull { it.key.equals(token, ignoreCase = true) }?.value
+                val corrections = mapOf("qeu" to "que", "donde" to "dónde", "tambien" to "también", "mas" to "más", "teh" to "the", "ola" to "hola")
+                val corrected = if (skipNextAutoCorrect) null else expansion ?: corrections[token.lowercase()] ?: SpanishPredictionEngine.autoCorrectCandidate(token, personal)
+                if (corrected != null) {
+                    val after = ic.getTextAfterCursor(40, 0)?.toString().orEmpty()
+                    ic.deleteSurroundingText(token.length, 0)
+                    removedForUndo = token
+                    leftForUndo = before.dropLast(token.length)
+                    val replacement = if (expansion == null && token.firstOrNull()?.isUpperCase() == true) corrected.replaceFirstChar { it.uppercase() } else corrected
+                    text = replacement + if (value == " ") " " else value
+                    didAutocorrect = true
+                    pushUndo(removedForUndo, text, leftForUndo, after)
+                }
             }
         }
-        if (value == " " || value in setOf(".", ",", "!", "?", ";", ":")) skipNextAutoCorrect = false
+        if (isBoundary) skipNextAutoCorrect = false
         if (text in setOf(".", ",", "!", "?", ";", ":") && prefs.getBoolean("auto_punctuation", false)) text += " "
-                ic.commitText(text, 1)
-        pushUndo(removedForUndo, text, leftForUndo, after)
+
+        ic.commitText(text, 1)
+        if (!didAutocorrect && selected.isNotEmpty()) {
+            pushUndo(selected, text, "", "")
+        }
         if (didAutocorrect) exposeUndoForFiveSeconds() else undoAvailableUntil = 0L
-        
-                if (shiftState == 1 && value.firstOrNull()?.isLetter() == true) {
+
+        if (shiftState == 1 && isLetter) {
             shiftState = 0
-            // Actualizamos las mayúsculas visualmente sin reconstruir todo
             keyRows?.let { rows ->
                 for (i in 0 until rows.childCount) {
                     val row = rows.getChildAt(i) as? ViewGroup ?: continue
@@ -1370,16 +1385,14 @@ class VozFlowIME : InputMethodService() {
                         val keyView = row.getChildAt(j) as? TextView ?: continue
                         val tag = keyView.tag as? String ?: continue
                         if (tag.length == 1 && tag[0].isLetter()) {
-                            keyView.text = tag.lowercase()
+                            keyView.text = displayed(tag)
                         }
                     }
                 }
             }
         }
-        
-        // IMPORTANTE: Solo actualizamos la barra de sugerencias si hay sugerencias activas
-        // Esto ahorra muchísimo procesamiento si tienes las sugerencias desactivadas
-        if (prefs.getBoolean("suggestions", true) && !passwordField) {
+
+        if (shouldUpdateSuggestions) {
             rebuildToolbar()
         }
     }
