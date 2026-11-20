@@ -152,7 +152,7 @@ class VozFlowIME : InputMethodService() {
                                     floatingHandle = view.findViewById(R.id.ime_floating_handle)
             dragHandle = view.findViewById(R.id.ime_drag_handle)
             
-            // NUEVO: Crear el botón de forma segura y guardarlo en la variable
+                        // NUEVO: Crear el botón de forma independiente (SIN insertarlo en la barra)
             closeFloatingBtn = TextView(this).apply {
                 text = "←"
                 textSize = 22f
@@ -176,15 +176,6 @@ class VozFlowIME : InputMethodService() {
                     rebuildKeys()
                     rebuildToolbar()
                 }
-            }
-                        // Lo insertamos en la barra superior (índice 0) de forma ultra-segura
-            val parentBar = floatingHandle?.parent as? ViewGroup
-            if (parentBar is LinearLayout) {
-                parentBar.addView(closeFloatingBtn, 0, LinearLayout.LayoutParams(dp(48), -1))
-            } else if (parentBar is FrameLayout) {
-                parentBar.addView(closeFloatingBtn, 0, FrameLayout.LayoutParams(dp(48), -1))
-            } else {
-                parentBar?.addView(closeFloatingBtn, 0)
             }
             floatingBottom = view.findViewById(R.id.ime_floating_bottom)
             floatingBottomDrag = view.findViewById(R.id.ime_floating_bottom_drag)
