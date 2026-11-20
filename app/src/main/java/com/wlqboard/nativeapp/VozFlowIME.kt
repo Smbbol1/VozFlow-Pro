@@ -379,16 +379,18 @@ class VozFlowIME : InputMethodService() {
                 leftMargin = if (savedX > 0) dp(savedX) else floatingX
                 topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
-                                    // FORZAR BORDES REDONDEADOS Y RECORTAR LA TARJETA
+                                                // FORZAR BORDES REDONDEADOS SIN USAR OUTLINEPROVIDER (Más rápido)
             val bgDrawable = GradientDrawable().apply {
                 setColor(backgroundColor())
                 cornerRadius = dp(18).toFloat()
                 setStroke(dp(1), Color.rgb(60, 55, 50))
             }
             card.background = bgDrawable
-            card.clipToOutline = true
-            card.outlineProvider = ViewOutlineProvider.BACKGROUND
+            card.clipToOutline = false // Desactivamos el recorte pesado
             card.elevation = dp(10).toFloat()
+            
+            // Aseguramos que los márgenes internos no se salgan de los bordes
+            card.setPadding(dp(4), dp(4), dp(4), dp(4))
             
             floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
