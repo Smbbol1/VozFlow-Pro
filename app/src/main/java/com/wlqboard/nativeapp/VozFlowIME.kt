@@ -61,10 +61,20 @@ class VozFlowIME : InputMethodService() {
     private var suggestionBar: LinearLayout? = null
         private var floatingHandle: View? = null
     private var dragHandle: View? = null
-    private var closeFloatingBtn: TextView? = null // <-- NUEVO: Botón para volver al teclado normal
-    private var floatingBottom: View? = null
-    private var floatingBottomDrag: View? = null
-    private var resizeHandle: View? = null
+    private fun readTextSnippets(): Map<String, String> = try {
+        val json = org.json.JSONObject(prefs.getString("text_snippets", "{}") ?: "{}")
+        json.keys().asSequence().mapNotNull { key -> json.optString(key).takeIf(String::isNotBlank)?.let { key to it } }.toMap()
+    } catch (_: Exception) { emptyMap() }
+
+    private fun personalWordsCache(): List<String> {
+        if (cachedPersonalWords.isEmpty()) cachedPersonalWords = readPersonalWords()
+        return cachedPersonalWords
+    }
+
+    private fun snippetsCache(): Map<String, String> {
+        if (cachedSnippets.isEmpty()) cachedSnippets = readTextSnippets()
+        return cachedSnippets
+    }
     private var sizeTopHandle: View? = null
     private var sizeControls: View? = null
     private var sizePercentLabel: TextView? = null
