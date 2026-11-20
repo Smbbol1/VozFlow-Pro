@@ -1,0 +1,29 @@
+name: Compilar APK (Manual ARM64)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Dar permisos a gradlew
+        run: chmod +x gradlew
+
+      - name: Compilar APK Debug (solo arm64-v8a)
+        run: ./gradlew assembleDebug -Pandroid.injected.build.abi=arm64-v8a
+
+      - name: Subir APK en ZIP para descarga
+        uses: actions/upload-artifact@v4
+        with:
+          name: VozFlow-Pro-arm64
+          path: app/build/outputs/apk/debug/*.apk
