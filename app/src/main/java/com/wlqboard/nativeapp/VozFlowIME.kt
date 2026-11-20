@@ -1427,16 +1427,24 @@ class VozFlowIME : InputMethodService() {
 
     private fun deleteOneTracked() {
         val ic = currentInputConnection ?: return
-        val before = ic.getTextBeforeCursor(80, 0)?.toString().orEmpty()
-        val after = ic.getTextAfterCursor(80, 0)?.toString().orEmpty()
         val selected = ic.getSelectedText(0)?.toString().orEmpty()
-        if (selected.isEmpty() && before.isEmpty()) return
-        val removed = if (selected.isNotEmpty()) selected else before.takeLast(Character.charCount(before.codePointBefore(before.length)))
-        if (removed.isEmpty()) return
-        if (selected.isNotEmpty()) ic.commitText("", 1) else ic.deleteSurroundingText(removed.length, 0)
-        pushUndo(removed, "", if (selected.isEmpty()) before.dropLast(removed.length) else before, after)
-        if (selected.isNotEmpty()) exposeUndoForFiveSeconds() else undoAvailableUntil = 0L
-        rebuildToolbar()
+        if (selected.isNotEmpty()) {
+            val before = ic.getTextBeforeCursor(40, 0)?.toString().orEmpty()
+            val after = ic.getTextAfterCursor(40, 0)?.toString().orEmpty()
+            ic.commitText("", 1)
+            pushUndo(selected, "", before, after)
+            exposeUndoForFiveSeconds()
+            rebuildToolbar()
+            return
+        }
+        val before = ic.getTextBeforeCursor(2, 0)?.toString().orEmpty()
+        if (before.isEmpty()) return
+        val charCount = Character.charCount(before.codePointBefore(before.length))
+        ic.deleteSurroundingText(charCount, 0)
+        undoAvailableUntil = 0L
+        if (!heldDelete && !passwordField && prefs.getBoolean("suggestions", true) && !listening) {
+            rebuildToolbar()
+        }
     }
 
     private fun pushUndo(removed: String, inserted: String, left: String, right: String) {
