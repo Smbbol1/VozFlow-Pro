@@ -246,7 +246,15 @@ class VozFlowIME : InputMethodService() {
                     clampFloatingCard(false)
                     true
                 }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { clampFloatingCard(true); true }
+                                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { 
+                    clampFloatingCard(true)
+                    // Guardar posición final en preferencias para que persista al cambiar de ventana
+                    prefs.edit()
+                        .putInt("floating_x_dp", (floatingX / resources.displayMetrics.density).toInt())
+                        .putInt("floating_y_dp", (floatingY / resources.displayMetrics.density).toInt())
+                        .apply()
+                    true 
+                }
                 else -> false
             }
         }
