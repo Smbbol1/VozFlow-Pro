@@ -402,8 +402,9 @@ class VozFlowIME : InputMethodService() {
             card.layoutParams = FrameLayout.LayoutParams(width, cardHeight).apply { this.gravity = gravity; bottomMargin = bottomGap }
             card.background = if (sizeEditing) GradientDrawable().apply { setColor(backgroundColor()); cornerRadius = dp(14).toFloat(); setStroke(dp(2), accentColor()) } else GradientDrawable().apply { setColor(backgroundColor()) }
             card.elevation = 0f
-            floatingHandle?.visibility = View.GONE
+                        floatingHandle?.visibility = View.GONE
             floatingBottom?.visibility = View.GONE
+            closeFloatingBtn?.visibility = View.GONE // Ocultar botón
             getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             getWindow().window?.setLayout(-1, cardHeight + bottomGap)
         }
