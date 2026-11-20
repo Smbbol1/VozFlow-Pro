@@ -26,4 +26,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: VozFlow-Pro-arm64
-          path: '**/*.apk'
+          path: |
+            /outputs//*.apk
+            !/intermediates/
