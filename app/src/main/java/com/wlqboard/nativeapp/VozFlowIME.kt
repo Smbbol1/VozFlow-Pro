@@ -59,8 +59,9 @@ class VozFlowIME : InputMethodService() {
     private var keyboardCard: LinearLayout? = null
     private var toolbar: LinearLayout? = null
     private var suggestionBar: LinearLayout? = null
-    private var floatingHandle: View? = null
+        private var floatingHandle: View? = null
     private var dragHandle: View? = null
+    private var closeFloatingBtn: TextView? = null // <-- NUEVO: Botón para volver al teclado normal
     private var floatingBottom: View? = null
     private var floatingBottomDrag: View? = null
     private var resizeHandle: View? = null
