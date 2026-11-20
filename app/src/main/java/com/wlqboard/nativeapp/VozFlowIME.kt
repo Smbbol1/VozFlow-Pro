@@ -386,8 +386,10 @@ class VozFlowIME : InputMethodService() {
             }
             card.background = rounded(backgroundColor(), 18)
             card.elevation = dp(10).toFloat()
-            floatingHandle?.visibility = View.VISIBLE
+                        floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
+            // Mostrar el botón de volver (si existe)
+            (floatingHandle?.parent as? ViewGroup)?.getChildAt(0)?.visibility = View.VISIBLE
             getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             getWindow().window?.setLayout(-1, screenH)
         } else {
