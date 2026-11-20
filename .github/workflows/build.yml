@@ -19,17 +19,22 @@ jobs:
       - name: Dar permisos a gradlew
         run: chmod +x gradlew
 
-      - name: Compilar APK Debug (solo arm64-v8a)
-        run: ./gradlew assembleDebug -Pandroid.injected.build.abi=arm64-v8a
+      - name: Compilar APK Debug
+        run: ./gradlew :app:assembleDebug --stacktrace
 
-      - name: Firmar APK para instalación
+      - name: Preparar y firmar APK final
         run: |
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | sort -V | tail -n 1)
-          $APKSIGNER sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --out VozFlow-Pro-arm64.apk app/build/intermediates/apk/debug/app-debug.apk
+          if [ -f app/build/outputs/apk/debug/app-debug.apk ]; then
+            cp app/build/outputs/apk/debug/app-debug.apk VozFlow-Pro.apk
+          else
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            BUILD_TOOLS=$(find $ANDROID_HOME/build-tools -maxdepth 1 -mindepth 1 | sort -V | tail -n 1)
+            $BUILD_TOOLS/zipalign -p -f -v 4 app/build/intermediates/apk/debug/app-debug.apk aligned.apk
+            $BUILD_TOOLS/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --out VozFlow-Pro.apk aligned.apk
+          fi
 
       - name: Subir APK en ZIP para descarga
         uses: actions/upload-artifact@v4
         with:
-          name: VozFlow-Pro-arm64
-          path: VozFlow-Pro-arm64.apk
+          name: VozFlow-Pro-APK
+          path: VozFlow-Pro.apk
