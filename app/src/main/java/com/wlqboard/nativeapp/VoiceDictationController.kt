@@ -373,9 +373,20 @@ class VoiceDictationController(
         }
     }
 
-    private fun commitRecognizedText(rawText: String) {
+        private fun commitRecognizedText(rawText: String) {
         onUi { onRecognized(rawText) }
-        val converted = applyVoiceCommands(SpanishPredictionEngine.correct(applyVoiceProfile(rawText), readPersonalWords()))
+        
+        // NUEVO: Comprobar si el usuario desactivó la corrección en dictado
+        val disableDictationCorrection = preferences.getBoolean("disable_dictation_correction", false)
+        
+        val converted = if (disableDictationCorrection) {
+            // Si está desactivado, no pasamos por el motor de corrección, pero sí aplicamos comandos
+            applyVoiceCommands(rawText)
+        } else {
+            // Flujo normal: aplicar perfil de voz, corrección y comandos
+            applyVoiceCommands(SpanishPredictionEngine.correct(applyVoiceProfile(rawText), readPersonalWords()))
+        }
+
         if (converted.isBlank()) return
         onUi {
             inputConnection()?.let { connection ->
