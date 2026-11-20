@@ -148,8 +148,40 @@ class VozFlowIME : InputMethodService() {
             keyboardCard = view.findViewById(R.id.ime_card)
             toolbar = view.findViewById(R.id.ime_toolbar)
             suggestionBar = view.findViewById(R.id.ime_suggestions)
-            floatingHandle = view.findViewById(R.id.ime_floating_handle)
+                        floatingHandle = view.findViewById(R.id.ime_floating_handle)
             dragHandle = view.findViewById(R.id.ime_drag_handle)
+            
+            // NUEVO: Añadir botón de "Volver al teclado normal" a la izquierda en modo flotante
+            if (floatingHandle?.parent is ViewGroup) {
+                val parentBar = floatingHandle?.parent as ViewGroup
+                val closeFloatingBtn = TextView(this).apply {
+                    text = "←"
+                    textSize = 22f
+                    setTextColor(textColor())
+                    gravity = Gravity.CENTER
+                    setPadding(dp(12), 0, dp(12), 0)
+                    setOnClickListener {
+                        // Desactivar modo flotante y restaurar valores por defecto
+                        setFloatingMode(false)
+                        prefs.edit()
+                            .putString("one_hand_mode", "off")
+                            .putInt("floating_width_percent", 78)
+                            .putInt("floating_height_percent", 100)
+                            .putInt("height_percent", 100)
+                            .putInt("keyboard_bottom_margin", 0)
+                            .putInt("floating_x_dp", 0)
+                            .putInt("floating_y_dp", 0)
+                            .apply()
+                        floatingX = 0
+                        floatingY = 0
+                        root?.let(::applyKeyboardHeight)
+                        rebuildKeys()
+                        rebuildToolbar()
+                    }
+                }
+                // Lo insertamos al principio de la barra (índice 0)
+                parentBar.addView(closeFloatingBtn, 0, LinearLayout.LayoutParams(dp(48), -1))
+            }
             floatingBottom = view.findViewById(R.id.ime_floating_bottom)
             floatingBottomDrag = view.findViewById(R.id.ime_floating_bottom_drag)
             resizeHandle = view.findViewById(R.id.ime_resize_handle)
