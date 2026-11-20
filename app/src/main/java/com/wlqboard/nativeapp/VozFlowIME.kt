@@ -1493,6 +1493,16 @@ class VozFlowIME : InputMethodService() {
         json.keys().asSequence().mapNotNull { key -> json.optString(key).takeIf(String::isNotBlank)?.let { key to it } }.toMap()
     } catch (_: Exception) { emptyMap() }
 
+    private fun personalWordsCache(): List<String> {
+        if (cachedPersonalWords.isEmpty()) cachedPersonalWords = readPersonalWords()
+        return cachedPersonalWords
+    }
+
+    private fun snippetsCache(): Map<String, String> {
+        if (cachedSnippets.isEmpty()) cachedSnippets = readTextSnippets()
+        return cachedSnippets
+    }
+
     private fun performAction() {
         val ic = currentInputConnection ?: return
         ic.sendKeyEvent(android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_ENTER))
