@@ -113,6 +113,8 @@ class VozFlowIME : InputMethodService() {
     private var suppressSelectionRestore = false
     private var lastKeyClickAt = 0L
     private val undoRecords = ArrayDeque<UndoRecord>()
+    private var cachedPersonalWords: List<String> = emptyList()
+    private var cachedSnippets: Map<String, String> = emptyMap()
     private var deleteHandler = Handler(Looper.getMainLooper())
     private var modelReleaseHandler = Handler(Looper.getMainLooper())
     private var clipboardListener: ClipboardManager.OnPrimaryClipChangedListener? = null
