@@ -379,19 +379,26 @@ class VozFlowIME : InputMethodService() {
                 leftMargin = if (savedX > 0) dp(savedX) else floatingX
                 topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
-                        card.background = rounded(backgroundColor(), 18)
+                                    // FORZAR BORDES REDONDEADOS Y RECORTAR LA TARJETA
+            val bgDrawable = GradientDrawable().apply {
+                setColor(backgroundColor())
+                cornerRadius = dp(18).toFloat()
+                setStroke(dp(1), Color.rgb(60, 55, 50))
+            }
+            card.background = bgDrawable
+            card.clipToOutline = true
+            card.outlineProvider = ViewOutlineProvider.BACKGROUND
             card.elevation = dp(10).toFloat()
+            
             floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
             
-            // NUEVO: Añadir el botón visualmente flotando sobre la tarjeta del teclado
+            // AÑADIR EL BOTÓN A LA BARRA SUPERIOR SIN ROMPER EL ARRASTRE
             closeFloatingBtn?.let { btn ->
-                if (btn.parent == null) {
-                    (host as? ViewGroup)?.addView(btn, FrameLayout.LayoutParams(dp(48), dp(48)).apply {
-                        gravity = Gravity.TOP or Gravity.START
-                        leftMargin = (card.layoutParams as FrameLayout.LayoutParams).leftMargin + dp(8)
-                        topMargin = (card.layoutParams as FrameLayout.LayoutParams).topMargin + dp(8)
-                    })
+                val parentBar = floatingHandle?.parent as? ViewGroup
+                if (parentBar != null && btn.parent == null) {
+                    // Lo insertamos al principio de la barra de arrastre
+                    parentBar.addView(btn, 0, ViewGroup.LayoutParams(dp(48), ViewGroup.LayoutParams.MATCH_PARENT))
                 }
                 btn.visibility = View.VISIBLE
             }
