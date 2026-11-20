@@ -326,17 +326,23 @@ class VozFlowIME : InputMethodService() {
             host.layoutParams = FrameLayout.LayoutParams(-1, baseHeight)
             return
         }
-        if (floatingMode) {
+                if (floatingMode) {
             val screenW = resources.displayMetrics.widthPixels
             val screenH = resources.displayMetrics.heightPixels
-            val width = (screenW * floatingWidthPercent / 100).coerceIn((screenW * 60 / 100), (screenW * 95 / 100))
+            // Permitimos que el ancho vaya desde un 10% hasta el 100% de la pantalla
+            val width = (screenW * floatingWidthPercent / 100).coerceIn(dp(100), screenW)
             val editExtra = if (sizeEditing) dp(56) else 0
-            val height = ((baseHeight + editExtra) * floatingHeightPercent / 100).coerceAtLeast(dp(160))
+            // Permitimos que el alto sea libre
+            val height = ((baseHeight + editExtra) * floatingHeightPercent / 100).coerceAtLeast(dp(100))
+            
             host.layoutParams = FrameLayout.LayoutParams(-1, screenH)
             card.layoutParams = FrameLayout.LayoutParams(width, height).apply {
                 gravity = Gravity.TOP or Gravity.LEFT
-                leftMargin = if (floatingX == 0 && prefs.getInt("floating_x_dp", 0) > 0) dp(prefs.getInt("floating_x_dp", 0)) else floatingX
-                topMargin = if (floatingY == 0 && prefs.getInt("floating_y_dp", 0) > 0) dp(prefs.getInt("floating_y_dp", 0)) else floatingY
+                // Recuperamos la posición guardada en preferencias si existe
+                val savedX = prefs.getInt("floating_x_dp", 0)
+                val savedY = prefs.getInt("floating_y_dp", 0)
+                leftMargin = if (savedX > 0) dp(savedX) else floatingX
+                topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
             card.background = rounded(backgroundColor(), 18)
             card.elevation = dp(10).toFloat()
