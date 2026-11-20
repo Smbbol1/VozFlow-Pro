@@ -379,11 +379,23 @@ class VozFlowIME : InputMethodService() {
                 leftMargin = if (savedX > 0) dp(savedX) else floatingX
                 topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
-            card.background = rounded(backgroundColor(), 18)
+                        card.background = rounded(backgroundColor(), 18)
             card.elevation = dp(10).toFloat()
-                                    floatingHandle?.visibility = View.VISIBLE
+            floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
-            closeFloatingBtn?.visibility = View.VISIBLE // Mostrar botón
+            
+            // NUEVO: Añadir el botón visualmente flotando sobre la tarjeta del teclado
+            closeFloatingBtn?.let { btn ->
+                if (btn.parent == null) {
+                    (host as? ViewGroup)?.addView(btn, FrameLayout.LayoutParams(dp(48), dp(48)).apply {
+                        gravity = Gravity.TOP or Gravity.START
+                        leftMargin = (card.layoutParams as FrameLayout.LayoutParams).leftMargin + dp(8)
+                        topMargin = (card.layoutParams as FrameLayout.LayoutParams).topMargin + dp(8)
+                    })
+                }
+                btn.visibility = View.VISIBLE
+            }
+            
             getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             getWindow().window?.setLayout(-1, screenH)
         } else {
