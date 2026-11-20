@@ -626,6 +626,8 @@ class VozFlowIME : InputMethodService() {
         if (fallbackMode) return
         try {
             modelReleaseHandler.removeCallbacks(releaseModelRunnable)
+            cachedPersonalWords = readPersonalWords()
+            cachedSnippets = readTextSnippets()
             root?.let(::applyKeyboardHeight)
             if (prefs.getBoolean("clipboard_enabled", true)) {
                 registerClipboardListener()
