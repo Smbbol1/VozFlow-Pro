@@ -19,14 +19,17 @@ jobs:
       - name: Dar permisos a gradlew
         run: chmod +x gradlew
 
-      - name: Compilar todas las variantes
-        run: ./gradlew assemble -Pandroid.injected.build.abi=arm64-v8a
+      - name: Compilar APK Debug (solo arm64-v8a)
+        run: ./gradlew assembleDebug -Pandroid.injected.build.abi=arm64-v8a
 
-      - name: Ver archivos APK generados
-        run: find . -name "*.apk"
+      - name: Firmar APK para instalación
+        run: |
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name "apksigner" | sort -V | tail -n 1)
+          $APKSIGNER sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android --out VozFlow-Pro-arm64.apk app/build/intermediates/apk/debug/app-debug.apk
 
       - name: Subir APK en ZIP para descarga
         uses: actions/upload-artifact@v4
         with:
           name: VozFlow-Pro-arm64
-          path: '/outputs/apk//*.apk'
+          path: VozFlow-Pro-arm64.apk
