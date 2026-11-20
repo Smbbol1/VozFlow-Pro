@@ -986,7 +986,7 @@ class VozFlowIME : InputMethodService() {
             val floatScale = if (floatingMode) (floatingWidthPercent / 78f).coerceIn(0.82f, 1.22f) else 1f
             val heightScale = ((previewHeightPercent ?: prefs.getInt("height_percent", 100)) / 100f) * (if (floatingMode) floatingHeightPercent / 100f else 1f)
             textSize = prefs.getInt("key_font_size", 19).toFloat() * bigScale / 100f * floatScale * heightScale.coerceIn(0.70f, 1.45f)
-            setTextColor(textColor())
+                        setTextColor(textColor())
             isClickable = true
             isFocusable = false
             background = keyRipple(when (kind) {
@@ -999,6 +999,11 @@ class VozFlowIME : InputMethodService() {
             if (prefs.getBoolean("key_preview", true)) setOnTouchListener { v, e ->
                 if (e.action == MotionEvent.ACTION_DOWN) {
                     showKeyPreview(v, label)
+                    // Si es una letra, escribimos INMEDIATAMENTE al tocar para quitar el lag
+                    if (kind == KeyKind.CHAR) {
+                        v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+                        commit(value)
+                    }
                 }
                 if (e.action == MotionEvent.ACTION_UP || e.action == MotionEvent.ACTION_CANCEL) {
                     dismissKeyPreview()
