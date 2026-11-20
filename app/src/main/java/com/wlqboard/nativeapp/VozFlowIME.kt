@@ -177,9 +177,15 @@ class VozFlowIME : InputMethodService() {
                     rebuildToolbar()
                 }
             }
-            // Lo insertamos en la barra superior (índice 0) de forma segura
-            (floatingHandle?.parent as? ViewGroup)?.addView(closeFloatingBtn, 0, LinearLayout.LayoutParams(dp(48), -1))
-            
+                        // Lo insertamos en la barra superior (índice 0) de forma ultra-segura
+            val parentBar = floatingHandle?.parent as? ViewGroup
+            if (parentBar is LinearLayout) {
+                parentBar.addView(closeFloatingBtn, 0, LinearLayout.LayoutParams(dp(48), -1))
+            } else if (parentBar is FrameLayout) {
+                parentBar.addView(closeFloatingBtn, 0, FrameLayout.LayoutParams(dp(48), -1))
+            } else {
+                parentBar?.addView(closeFloatingBtn, 0)
+            }
             floatingBottom = view.findViewById(R.id.ime_floating_bottom)
             floatingBottomDrag = view.findViewById(R.id.ime_floating_bottom_drag)
             resizeHandle = view.findViewById(R.id.ime_resize_handle)
