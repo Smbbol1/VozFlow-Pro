@@ -156,11 +156,15 @@ class MainActivity : Activity() {
             addToggle("Mover cursor deslizando en espacio", "space_cursor", true)
             addToggle("Borrar palabras completas al mantener", "quick_delete", true)
         }
-        addSection("🎙", "Dictado por voz") {
+                addSection("🎙", "Dictado por voz") {
             text("Reconocimiento local en español · el audio no se envía a internet.", 13, false, muted)
             addSeek("Apagado por silencio", "silence_timeout_ms", 1500, 7000, 3500, " ms")
             addPauseCapsSeek()
             addToggle("Supresión de ruido ambiental", "noise_suppression", true)
+            
+            // NUEVO: Interruptor para desactivar la autocorrección en dictado
+            addToggle("Desactivar corrección al dictar por voz", "disable_dictation_correction", false)
+            
             text("Comandos: “coma”, “punto”, “signo de interrogación” y “nueva línea”.", 13, false, muted)
             button("Entrenar y calibrar voz") { showVoiceTrainingDialog() }
             button("Ver / gestionar palabras entrenadas") { manageVoiceAliases() }
