@@ -1253,15 +1253,30 @@ class VozFlowIME : InputMethodService() {
         }
         if (value == " " || value in setOf(".", ",", "!", "?", ";", ":")) skipNextAutoCorrect = false
         if (text in setOf(".", ",", "!", "?", ";", ":") && prefs.getBoolean("auto_punctuation", false)) text += " "
-        ic.commitText(text, 1)
+                ic.commitText(text, 1)
         pushUndo(removedForUndo, text, leftForUndo, after)
         if (didAutocorrect) exposeUndoForFiveSeconds() else undoAvailableUntil = 0L
+        
         if (shiftState == 1 && value.firstOrNull()?.isLetter() == true) {
             shiftState = 0
-            rebuildKeys()
+            // En lugar de reconstruir todo el teclado, solo actualizamos las mayúsculas visualmente
+            keyRows?.let { rows ->
+                for (i in 0 until rows.childCount) {
+                    val row = rows.getChildAt(i) as? ViewGroup ?: continue
+                    for (j in 0 until row.childCount) {
+                        val keyView = row.getChildAt(j) as? TextView ?: continue
+                        val tag = keyView.tag as? String ?: continue
+                        if (tag.length == 1 && tag[0].isLetter()) {
+                            keyView.text = tag.lowercase()
+                        }
+                    }
+                }
+            }
         }
-        if (prefs.getBoolean("haptics", true)) root?.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
-        rebuildToolbar()
+        // Si el interruptor de sugerencias está apagado, ni siquiera actualizamos la barra
+        if (prefs.getBoolean("suggestions", true)) {
+            rebuildToolbar()
+        }
     }
 
     private fun deleteOne() = deleteOneTracked()
