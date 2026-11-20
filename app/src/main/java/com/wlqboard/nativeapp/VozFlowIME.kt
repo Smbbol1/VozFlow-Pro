@@ -1111,7 +1111,7 @@ class VozFlowIME : InputMethodService() {
                     performKeyboardHaptic(key)
                     if (prefs.getBoolean("quick_delete", true)) deleteWord()
                     heldDelete = true
-                    deleteHandler.postDelayed(deleteRepeat, 240)
+                    deleteHandler.postDelayed(deleteRepeat, 180)
                     true
                 }
                 key.setOnTouchListener { _, event ->
@@ -1119,6 +1119,7 @@ class VozFlowIME : InputMethodService() {
                     when (event.actionMasked) {
                         MotionEvent.ACTION_DOWN -> {
                             deleteSwipeActive = false
+                            lastSwipeWordCount = 0
                             deleteSwipeStartX = event.x
                             deleteSwipeCursorStart = extractedCursorPosition()
                             false
@@ -1127,19 +1128,22 @@ class VozFlowIME : InputMethodService() {
                             val dx = event.x - deleteSwipeStartX
                             if (dx < -dp(14)) {
                                 deleteSwipeActive = true
-                                val before = ic?.getTextBeforeCursor(120, 0)?.toString().orEmpty()
-                                val availableWords = before.trimEnd().takeLastWhile { !it.isWhitespace() }.length
-                                val wordCount = (kotlin.math.abs(dx) / dp(48)).toInt().coerceAtLeast(1)
-                                val trimmed = before.trimEnd()
-                                val wordStart = trimmed.indexOfLast { it.isWhitespace() }
-                                var start = if (wordStart < 0) 0 else wordStart + 1
-                                var remaining = wordCount - 1
-                                while (remaining > 0 && start > 0) {
-                                    start = trimmed.substring(0, start).trimEnd().indexOfLast { it.isWhitespace() }.let { if (it < 0) 0 else it + 1 }
-                                    remaining--
+                                val wordCount = (kotlin.math.abs(dx) / dp(44)).toInt().coerceAtLeast(1)
+                                if (wordCount != lastSwipeWordCount) {
+                                    lastSwipeWordCount = wordCount
+                                    val before = ic?.getTextBeforeCursor(140, 0)?.toString().orEmpty()
+                                    val availableWords = before.trimEnd().takeLastWhile { !it.isWhitespace() }.length
+                                    val trimmed = before.trimEnd()
+                                    val wordStart = trimmed.indexOfLast { it.isWhitespace() }
+                                    var start = if (wordStart < 0) 0 else wordStart + 1
+                                    var remaining = wordCount - 1
+                                    while (remaining > 0 && start > 0) {
+                                        start = trimmed.substring(0, start).trimEnd().indexOfLast { it.isWhitespace() }.let { if (it < 0) 0 else it + 1 }
+                                        remaining--
+                                    }
+                                    val toDelete = (before.length - start).coerceAtLeast(availableWords)
+                                    ic?.setSelection((deleteSwipeCursorStart - toDelete).coerceAtLeast(0), deleteSwipeCursorStart)
                                 }
-                                val toDelete = (before.length - start).coerceAtLeast(availableWords)
-                                ic?.setSelection((deleteSwipeCursorStart - toDelete).coerceAtLeast(0), deleteSwipeCursorStart)
                                 true
                             } else deleteSwipeActive
                         }
