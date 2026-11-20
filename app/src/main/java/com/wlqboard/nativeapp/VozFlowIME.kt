@@ -417,11 +417,11 @@ class VozFlowIME : InputMethodService() {
             host.layoutParams = FrameLayout.LayoutParams(-1, cardHeight + bottomGap)
             card.layoutParams = FrameLayout.LayoutParams(width, cardHeight).apply { this.gravity = gravity; bottomMargin = bottomGap }
             card.background = if (sizeEditing) GradientDrawable().apply { setColor(backgroundColor()); cornerRadius = dp(14).toFloat(); setStroke(dp(2), accentColor()) } else GradientDrawable().apply { setColor(backgroundColor()) }
-                        card.elevation = 0f
+                                    card.elevation = 0f
             floatingHandle?.visibility = View.GONE
             floatingBottom?.visibility = View.GONE
             
-            // NUEVO: Ocultar y eliminar el botón del contenedor
+            // ELIMINAR EL BOTÓN DE LA BARRA PARA QUE NO SE QUEDE FLOTANDO EN MODO NORMAL
             closeFloatingBtn?.let { btn ->
                 btn.visibility = View.GONE
                 (btn.parent as? ViewGroup)?.removeView(btn)
