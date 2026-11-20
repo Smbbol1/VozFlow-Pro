@@ -1,0 +1,9 @@
+<resources>
+    <color name="brand_primary">#D8A76A</color>
+    <color name="text_secondary">#B4ACA4</color>
+    <color name="warm_background">#1A1918</color>
+    <color name="warm_key">#2C2A29</color>
+    <color name="warm_special">#24211E</color>
+    <color name="warm_action">#3D3228</color>
+    <color name="warm_text">#EAE6E1</color>
+</resources>
