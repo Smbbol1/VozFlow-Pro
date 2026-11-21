@@ -469,14 +469,15 @@ class VozFlowIME : InputMethodService() {
             
             // ELIMINAR EL BOTÓN DE LA BARRA PARA QUE NO SE QUEDE FLOTANDO EN MODO NORMAL
             closeFloatingBtn?.let { btn ->
-                btn.visibility = View.GONE
+                                btn.visibility = View.GONE
                 (btn.parent as? ViewGroup)?.removeView(btn)
             }
             
-            getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            getWindow().window?.setLayout(-1, cardHeight + bottomGap)
+            window?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window?.window?.setLayout(-1, cardHeight + bottomGap)
         }
         sizeTopHandle?.visibility = if (sizeEditing) View.VISIBLE else View.GONE
+
         sizeControls?.visibility = if (sizeEditing) View.VISIBLE else View.GONE
         if (!floatingMode) floatingBottom?.visibility = View.GONE
         host.requestLayout()
