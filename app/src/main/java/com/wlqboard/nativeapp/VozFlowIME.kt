@@ -388,23 +388,23 @@ class VozFlowIME : InputMethodService() {
             host.layoutParams = FrameLayout.LayoutParams(-1, baseHeight)
             return
         }
-                        if (floatingMode) {
+        if (floatingMode) {
             val screenW = resources.displayMetrics.widthPixels
             val screenH = resources.displayMetrics.heightPixels
-            val safeWidthPercent = floatingWidthPercent.coerceIn(60, 95)
-            val safeHeightPercent = floatingHeightPercent.coerceIn(70, 145)
-            val width = (screenW * safeWidthPercent / 100).coerceIn(dp(220), screenW)
+            val safeWidthPercent = floatingWidthPercent.coerceIn(45, 100)
+            val safeHeightPercent = floatingHeightPercent.coerceIn(65, 180)
+            val width = (screenW * safeWidthPercent / 100).coerceIn(dp(180), screenW)
             val editExtra = if (sizeEditing) dp(56) else 0
-            val height = ((baseHeight + editExtra) * safeHeightPercent / 100).coerceAtLeast(dp(220))
+            val maxAllowedHeight = (screenH * 0.75f).toInt()
+            val height = ((baseHeight + editExtra) * safeHeightPercent / 100).coerceIn(dp(190), maxAllowedHeight)
 
             host.layoutParams = FrameLayout.LayoutParams(-1, screenH)
             card.layoutParams = FrameLayout.LayoutParams(width, height).apply {
                 gravity = Gravity.TOP or Gravity.LEFT
-                val savedX = prefs.getInt("floating_x_dp", 0)
-                val savedY = prefs.getInt("floating_y_dp", 0)
-                leftMargin = if (savedX > 0) dp(savedX) else floatingX
-                topMargin = if (savedY > 0) dp(savedY) else floatingY
+                leftMargin = floatingX.coerceIn(0, (screenW - width).coerceAtLeast(0))
+                topMargin = floatingY.coerceIn(0, (screenH - height).coerceAtLeast(0))
             }
+
 
                         val bgDrawable = GradientDrawable().apply {
                 setColor(backgroundColor())
