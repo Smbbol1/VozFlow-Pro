@@ -845,10 +845,11 @@ class VozFlowIME : InputMethodService() {
             addToolbarButton(bar, "⇄", 0.85f) { undoAvailableUntil = 0L; toolbarToolsExpanded = false; rebuildToolbar() }
             val mic = addToolbarButton(bar, "🎙", 0.9f) { toggleVoice() }
             styleMic(mic)
-        } else {
+                } else {
             addToolbarButton(bar, "▦", 0.75f) { if (token.isNotEmpty()) { toolbarToolsExpanded = false; rebuildToolbar() } else showModesPanel() }
             addToolbarButton(bar, "✂", 0.9f) { if (panelMode == "tools") restoreKeys() else showEditPanel() }
-            addToolbarButton(bar, "📋", 0.9f) { toggleClipboard() }
+            val clipBtn = addToolbarButton(bar, "📋", 0.9f) { toggleClipboard() }
+            if (showingClipboard) clipBtn.setTextColor(accentColor())
             addToolbarButton(bar, "▣", 0.85f) { copyCurrentText() }
             addToolbarButton(bar, "▤", 0.85f) { trackedClipboardAction(paste = true) }
             addToolbarButton(bar, "⌫", 0.9f) { deleteCurrentFieldOrSelection() }
