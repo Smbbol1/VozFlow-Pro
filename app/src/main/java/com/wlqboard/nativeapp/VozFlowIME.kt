@@ -803,13 +803,12 @@ class VozFlowIME : InputMethodService() {
         unregisterClipboardListener()
         stopVoice()
         modelReleaseHandler.removeCallbacksAndMessages(null)
-        try { clipboardListener?.let { clipboard.removePrimaryClipChangedListener(it) } }
+                try { clipboardListener?.let { clipboard.removePrimaryClipChangedListener(it) } }
         catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: limpieza del portapapeles") }
-        try { voice?.shutdown() }
-        catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: cierre del motor de voz") }
-        voice = null
+        releaseVoiceModelNow()
         try { clipboardStore?.close() } catch (_: Exception) { }
         clipboardStore = null
+
         super.onDestroy()
     }
 
