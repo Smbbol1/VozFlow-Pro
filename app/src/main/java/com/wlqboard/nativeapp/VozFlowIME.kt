@@ -686,21 +686,20 @@ class VozFlowIME : InputMethodService() {
     override fun onFinishInputView(finishingInput: Boolean) {
         unregisterClipboardListener()
         stopVoice()
-        modelReleaseHandler.removeCallbacks(releaseModelRunnable)
+                modelReleaseHandler.removeCallbacks(releaseModelRunnable)
         releaseVoiceModelNow()
-        closeClipboardStore()
         clearTransientUi()
         super.onFinishInputView(finishingInput)
     }
 
-        override fun onWindowHidden() {
+    override fun onWindowHidden() {
         unregisterClipboardListener()
         stopVoice()
         modelReleaseHandler.removeCallbacks(releaseModelRunnable)
         releaseVoiceModelNow()
-        closeClipboardStore()
         clearTransientUi()
         super.onWindowHidden()
+
     }
 
     override fun onEvaluateFullscreenMode(): Boolean = false
