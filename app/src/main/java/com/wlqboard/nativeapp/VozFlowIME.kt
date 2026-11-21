@@ -1139,11 +1139,12 @@ class VozFlowIME : InputMethodService() {
         val key = TextView(this).apply {
             text = label
             gravity = Gravity.CENTER
-            val bigScale = if (prefs.getBoolean("big_keys_enabled", false)) prefs.getInt("big_keys_scale", 120).coerceIn(100, 150) else 100
-            val floatScale = if (floatingMode) (floatingWidthPercent / 78f).coerceIn(0.82f, 1.22f) else 1f
+                        val bigScale = if (prefs.getBoolean("big_keys_enabled", false)) prefs.getInt("big_keys_scale", 120).coerceIn(100, 150) else 100
+            val floatScale = if (floatingMode) (floatingWidthPercent / 78f).coerceIn(0.25f, 1.22f) else 1f
             val heightScale = ((previewHeightPercent ?: prefs.getInt("height_percent", 100)) / 100f) * (if (floatingMode) floatingHeightPercent / 100f else 1f)
-            textSize = prefs.getInt("key_font_size", 19).toFloat() * bigScale / 100f * floatScale * heightScale.coerceIn(0.70f, 1.45f)
-                        setTextColor(textColor())
+            textSize = (prefs.getInt("key_font_size", 19).toFloat() * bigScale / 100f * floatScale * heightScale.coerceIn(0.25f, 1.45f)).coerceAtLeast(6f)
+            setTextColor(textColor())
+
             isClickable = true
             isFocusable = false
             background = keyRipple(when (kind) {
