@@ -885,31 +885,42 @@ class VozFlowIME : InputMethodService() {
 
         val hasNextWordContext = token.isEmpty() && currentInputConnection?.getTextBeforeCursor(80, 0)?.toString()?.let { it.isNotBlank() && it.lastOrNull()?.isWhitespace() == true } == true
         val suggestionsOn = !passwordField && prefs.getBoolean("suggestions", true) && !listening && (token.isNotEmpty() || hasNextWordContext)
-        val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
-                if (suggestionsOn && !toolbarToolsExpanded && !showUndo) {
-            addToolbarButton(bar, "❖", 0.82f) { showModesPanel() }
+                val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
+        if (suggestionsOn && !toolbarToolsExpanded && !showUndo) {
+            val iconWidth = dp(38)
+            addToolbarButton(bar, "❖", 0f) { showModesPanel() }.apply {
+                layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
+                textSize = 16f
+            }
             val choices = candidateWords()
             choices.forEachIndexed { index, word ->
                 val candidate = TextView(this).apply {
                     text = word
                     gravity = Gravity.CENTER
-                    textSize = if (index == 1) 14f else 12f
+                    textSize = if (index == 1) 14f else 13f
                     setTypeface(typeface, if (index == 1) Typeface.BOLD else Typeface.NORMAL)
                     setTextColor(if (word.isBlank()) Color.TRANSPARENT else textColor())
                     maxLines = 1
                     ellipsize = android.text.TextUtils.TruncateAt.END
+                    setPadding(dp(4), 0, dp(4), 0)
                     setOnClickListener {
                         if (token.isEmpty()) { if (word.isNotBlank()) commit(word + " ") }
                         else if (index == 0) { skipNextAutoCorrect = true; showToast("Se conservará «$token" + "»") }
                         else replaceCurrentWord(word)
                     }
                 }
-                bar.addView(candidate, LinearLayout.LayoutParams(0, -1, if (index == 1) 1.2f else 1f))
+                bar.addView(candidate, LinearLayout.LayoutParams(0, -1, 1f))
             }
-            addToolbarButton(bar, "⇄", 0.82f) { toolbarToolsExpanded = true; rebuildToolbar() }
-            val mic = addToolbarButton(bar, "🎤", 0.9f) { toggleVoice() }
+            addToolbarButton(bar, "⇄", 0f) { toolbarToolsExpanded = true; rebuildToolbar() }.apply {
+                layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
+                textSize = 16f
+            }
+            val mic = addToolbarButton(bar, "🎤", 0f) { toggleVoice() }
             styleMic(mic)
+            mic.layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
+            mic.textSize = 16f
         } else if (showUndo) {
+
             addToolbarButton(bar, "❖", 0.85f) { showModesPanel() }
             val undo = addToolbarButton(bar, "↶ Deshacer", 3.8f) { undoAvailableUntil = 0L; undoLastEdit() }
             undo.textSize = 13f
