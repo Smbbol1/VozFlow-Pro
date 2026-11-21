@@ -113,12 +113,25 @@ class MainActivity : Activity() {
             addToggle("Modo dedos grandes / Evitar errores de pulsación", "big_keys_enabled", false)
             addSeek("Ampliación de teclas", "big_keys_scale", 100, 150, 120, "%")
             addSeek("Sensibilidad táctil", "touch_sensitivity", 1, 10, 5, " / 10")
-            addOneHandSelector()
+                        addOneHandSelector()
             addToggle("Fila de números superior", "number_row", true)
             addToggle("Vibración háptica al pulsar", "haptics", true)
             addToggle("Vista previa de letra", "key_preview", true)
+
+            text("Fila inferior (tamaño y teclas visibles)", 14, true).also {
+                addView(it, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10); bottomMargin = dp(4) })
+            }
+            addSeek("Ancho de barra espaciadora", "space_bar_weight", 15, 65, 38, "%")
+            addToggle("Mostrar tecla ?123 / ABC", "bottom_key_symbols", true)
+            addToggle("Mostrar tecla coma (, / /)", "bottom_key_comma", true)
+            addToggle("Mostrar tecla emoji (☺)", "bottom_key_emoji", true)
+            addToggle("Mostrar tecla símbolo libre (@)", "bottom_key_free_symbol", true)
+            addToggle("Mostrar barra espaciadora", "bottom_key_space", true)
+            addToggle("Mostrar tecla punto (.)", "bottom_key_period", true)
+            addToggle("Mostrar tecla Enter (↵)", "bottom_key_enter", true)
         }
         addSection("🎨", "Tema") {
+
             val themes = listOf("Oscuro Cálido", "Claro", "Negro Puro AMOLED")
             val group = RadioGroup(this@MainActivity).apply { orientation = RadioGroup.VERTICAL }
             val current = prefs.getString("keyboard_theme", "warm") ?: "warm"
