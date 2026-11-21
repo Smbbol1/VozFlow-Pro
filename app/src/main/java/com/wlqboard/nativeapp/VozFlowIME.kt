@@ -312,14 +312,14 @@ class VozFlowIME : InputMethodService() {
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (!floatingMode) return@setOnTouchListener false
-                    val screenW = resources.displayMetrics.widthPixels.toFloat()
-                    val deltaX = if (isLeftHandle) (downRawX - event.rawX) else (event.rawX - downRawX)
+                                        val deltaX = if (isLeftHandle) (downRawX - event.rawX) else (event.rawX - downRawX)
                     val deltaY = event.rawY - downRawY
 
-                    val newWidth = (startWidthPercent + (deltaX * 100f / screenW).toInt()).coerceIn(45, 100)
-                    val newHeight = (startHeightPercent + (deltaY * 100f / dp(270)).toInt()).coerceIn(65, 180)
+                    val newWidth = (startWidthPercent + (deltaX * 100f / screenW).toInt()).coerceIn(12, 100)
+                    val newHeight = (startHeightPercent + (deltaY * 100f / dp(270)).toInt()).coerceIn(16, 180)
 
                     if (newWidth != floatingWidthPercent || newHeight != floatingHeightPercent) {
+
                         if (isLeftHandle) {
                             val widthDiffPx = ((newWidth - startWidthPercent) * screenW / 100f).toInt()
                             floatingX = (startX - widthDiffPx).coerceIn(0, (screenW - (screenW * newWidth / 100f)).toInt())
