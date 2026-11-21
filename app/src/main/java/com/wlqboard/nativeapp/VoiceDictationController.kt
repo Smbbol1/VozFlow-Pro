@@ -110,17 +110,17 @@ class VoiceDictationController(
                 Thread.currentThread().interrupt()
             }
         }
-        synchronized(audioLock) {
+                synchronized(modelLock) {
             try {
                 model?.close()
             } catch (_: Exception) {
-                // The native model is best-effort closed during final teardown.
             } finally {
                 model = null
-                worker = null
             }
         }
+        synchronized(audioLock) { worker = null }
         onAmplitude(0f)
+
         onState(false, "Dictado cerrado")
     }
 
