@@ -1346,30 +1346,26 @@ class VozFlowIME : InputMethodService() {
                     "u" -> listOf("ú", "ù", "û", "ü")
                     else -> emptyList()
                 }
-                var longPressed = false
-                key.setOnTouchListener { v, e ->
+                                key.setOnTouchListener { v, e ->
                     when (e.actionMasked) {
                         MotionEvent.ACTION_DOWN -> {
-                            longPressed = false
                             if (prefs.getBoolean("key_preview", true)) showKeyPreview(v, label)
-                            if (accents.isEmpty()) { performKeyboardHaptic(v); commit(value) }
+                            performKeyboardHaptic(v)
+                            commit(value)
                         }
-                        MotionEvent.ACTION_UP -> {
-                            dismissKeyPreview()
-                            if (accents.isNotEmpty() && !longPressed) { performKeyboardHaptic(v); commit(value) }
-                        }
-                        MotionEvent.ACTION_CANCEL -> dismissKeyPreview()
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> dismissKeyPreview()
                     }
                     false
                 }
                 if (accents.isNotEmpty()) {
                     key.setOnLongClickListener {
-                        longPressed = true
                         dismissKeyPreview()
+                        currentInputConnection?.deleteSurroundingText(1, 0)
                         showPopup(key, if (shiftState > 0) accents.map { it.uppercase() } else accents)
                         true
                     }
                 }
+
             }
         }
         return key
