@@ -472,32 +472,22 @@ class VoiceDictationController(
         return result
     }
 
-    private fun applyVoiceCommands(raw: String): String {
+        private fun applyVoiceCommands(raw: String): String {
         var text = raw.trim()
-        val commandReplacements = listOf(
-            Regex("\\b(?:nuevo párrafo|nuevo parrafo)\\b", RegexOption.IGNORE_CASE) to "\n\n",
-            Regex("\\b(?:nueva línea|salto de línea)\\b", RegexOption.IGNORE_CASE) to "\n",
-            Regex("\\babre interrogación\\b", RegexOption.IGNORE_CASE) to "¿",
-            Regex("\\bcierra interrogación\\b", RegexOption.IGNORE_CASE) to "?",
-            Regex("\\bsigno de interrogación\\b", RegexOption.IGNORE_CASE) to "?",
-            Regex("\\binterrogación\\b", RegexOption.IGNORE_CASE) to "?",
-            Regex("\\bcoma\\b", RegexOption.IGNORE_CASE) to ",",
-            Regex("\\bdos puntos\\b", RegexOption.IGNORE_CASE) to ":",
-            Regex("\\bpunto\\b", RegexOption.IGNORE_CASE) to "."
-        )
-        for ((pattern, replacement) in commandReplacements) text = pattern.replace(text, replacement)
-        if (Regex("\\bborrar última palabra\\b", RegexOption.IGNORE_CASE).containsMatchIn(text)) {
+        for ((pattern, replacement) in COMMAND_REPLACEMENTS) text = pattern.replace(text, replacement)
+        if (DELETE_LAST_WORD_REGEX.containsMatchIn(text)) {
             onUi { inputConnection()?.let { connection ->
                 val before = connection.getTextBeforeCursor(120, 0)?.toString().orEmpty()
                 val remove = (before.takeLastWhile { it.isWhitespace() }.length + before.trimEnd().takeLastWhile { !it.isWhitespace() }.length).coerceAtLeast(1)
                 connection.deleteSurroundingText(remove, 0)
             } }
-            text = Regex("\\bborrar última palabra\\b", RegexOption.IGNORE_CASE).replace(text, "")
+            text = DELETE_LAST_WORD_REGEX.replace(text, "")
         }
-        text = text.replace(Regex("\\s+([,?.!;:])"), "$1")
-        text = text.replace(Regex("([,?.!;:])(?=\\S)"), "$1 ")
+        text = SPACE_BEFORE_PUNCT_REGEX.replace(text, "$1")
+        text = SPACE_AFTER_PUNCT_REGEX.replace(text, "$1 ")
         return capitalizeAfterPeriods(text)
     }
+
 
     private fun applyVoiceProfile(raw: String): String = try {
         val json = JSONObject(preferences.getString("voice_profile_rules", "{}") ?: "{}")
