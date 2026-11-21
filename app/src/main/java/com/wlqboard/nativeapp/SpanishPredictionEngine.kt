@@ -60,31 +60,52 @@ object SpanishPredictionEngine {
         }
     }
 
-    /** Literal, best correction/prefix completion and a second candidate, in that order. */
+        /** Literal, best correction/prefix completion and a second candidate, in that order. */
     fun suggestions(token: String, personalWords: Collection<String>, previousWord: String = ""): List<String> {
         if (token.isBlank()) {
             val next = nextWords[normalize(previousWord)] ?: listOf("de", "que")
             return listOf("", next.getOrElse(0) { "" }, next.getOrElse(1) { "" })
         }
         val norm = normalize(token)
-        val pool = (commonWords + personalWords + technologyTerms).distinctBy(::normalize)
-        val ranked = pool.asSequence().filter { normalize(it) != norm }
-            .map { word ->
+        val personalNorms = personalWords.map(::normalize).toSet()
+        val commonIndex = commonWords.mapIndexed { idx, w -> normalize(w) to idx }.toMap()
+        val pool = (personalWords + commonWords + technologyTerms).distinctBy(::normalize)
+
+        val ranked = pool.asSequence()
+            .filter { normalize(it) != norm }
+            .mapNotNull { word ->
                 val candidate = normalize(word)
+                val isPersonal = candidate in personalNorms
+                val freqRank = commonIndex[candidate] ?: 999
                 val score = when {
-                    candidate.startsWith(norm) -> distance(candidate, norm) * 0.1
-                    norm.startsWith(candidate) -> 3.0 + distance(candidate, norm)
-                    else -> distance(candidate, norm) + 2.0
+                    candidate.startsWith(norm) -> {
+                        val lenDiff = (candidate.length - norm.length) * 0.05
+                        val priorityBonus = when {
+                            isPersonal -> -0.5
+                            freqRank < 999 -> freqRank * 0.002
+                            else -> 0.6
+                        }
+                        lenDiff + priorityBonus
+                    }
+                    else -> {
+                        val dist = distance(candidate, norm)
+                        val maxAllowedDist = if (norm.length <= 3) 1 else max(2, norm.length / 3)
+                        if (dist > maxAllowedDist) return@mapNotNull null
+                        dist + 3.0 + (if (isPersonal) -0.5 else 0.0)
+                    }
                 }
                 word to score
             }
-            .filter { (_, score) -> score < max(4.0, norm.length * 0.75) }
             .sortedBy { it.second }
-            .take(12).map { it.first }.toList()
-        val first = ranked.firstOrNull() ?: token
-        val second = ranked.drop(1).firstOrNull() ?: first
+            .take(6)
+            .map { preserveCase(token, it.first) }
+            .toList()
+
+        val first = ranked.firstOrNull() ?: ""
+        val second = ranked.drop(1).firstOrNull() ?: ""
         return listOf(token, first, second)
     }
+
 
     fun autoCorrectCandidate(token: String, personalWords: Collection<String>): String? {
         if (token.length < 4) return null
