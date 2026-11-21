@@ -937,7 +937,7 @@ class VozFlowIME : InputMethodService() {
                 layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
                 textSize = 16f
             }
-            val mic = addToolbarButton(bar, "🎤", 0f) { toggleVoice() }
+                        val mic = addToolbarButton(bar, "🎤", 0f) { toggleVoice() }
             styleMic(mic)
             mic.layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
             mic.textSize = 16f
@@ -947,9 +947,10 @@ class VozFlowIME : InputMethodService() {
         bar.tag = "tools_mode"
         bar.removeAllViews()
 
-        } else if (showUndo) {
+        if (showUndo) {
 
             addToolbarButton(bar, "❖", 0.85f) { showModesPanel() }
+
             val undo = addToolbarButton(bar, "↶ Deshacer", 3.8f) { undoAvailableUntil = 0L; undoLastEdit() }
             undo.textSize = 13f
             addToolbarButton(bar, "⇄", 0.85f) { undoAvailableUntil = 0L; toolbarToolsExpanded = false; rebuildToolbar() }
