@@ -884,18 +884,37 @@ class VozFlowIME : InputMethodService() {
             return
         }
 
-        val token = currentToken()
-
-        val hasNextWordContext = token.isEmpty() && currentInputConnection?.getTextBeforeCursor(80, 0)?.toString()?.let { it.isNotBlank() && it.lastOrNull()?.isWhitespace() == true } == true
+                val beforeCursor = currentInputConnection?.getTextBeforeCursor(40, 0)?.toString().orEmpty()
+        val token = beforeCursor.takeLastWhile { it.isLetterOrDigit() || it == '\'' || it == '’' }
+        val hasNextWordContext = token.isEmpty() && beforeCursor.isNotBlank() && beforeCursor.lastOrNull()?.isWhitespace() == true
         val suggestionsOn = !passwordField && prefs.getBoolean("suggestions", true) && !listening && (token.isNotEmpty() || hasNextWordContext)
-                val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
+        val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
+
         if (suggestionsOn && !toolbarToolsExpanded && !showUndo) {
+            val choices = candidateWords()
+            // Si la barra ya tiene las 6 vistas de sugerencias creadas, solo actualiza los textos (0 lag)
+            if (bar.tag == "suggestions_mode" && bar.childCount == 6) {
+                for (index in 0..2) {
+                    val candidate = bar.getChildAt(index + 1) as? TextView ?: continue
+                    val word = choices.getOrElse(index) { "" }
+                    candidate.text = word
+                    candidate.setTextColor(if (word.isBlank()) Color.TRANSPARENT else textColor())
+                    candidate.setOnClickListener {
+                        if (token.isEmpty()) { if (word.isNotBlank()) commit(word + " ") }
+                        else if (index == 0) { skipNextAutoCorrect = true; showToast("Se conservará «$token»") }
+                        else replaceCurrentWord(word)
+                    }
+                }
+                return
+            }
+
+            bar.removeAllViews()
+            bar.tag = "suggestions_mode"
             val iconWidth = dp(38)
             addToolbarButton(bar, "❖", 0f) { showModesPanel() }.apply {
                 layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
                 textSize = 16f
             }
-            val choices = candidateWords()
             choices.forEachIndexed { index, word ->
                 val candidate = TextView(this).apply {
                     text = word
@@ -908,7 +927,7 @@ class VozFlowIME : InputMethodService() {
                     setPadding(dp(4), 0, dp(4), 0)
                     setOnClickListener {
                         if (token.isEmpty()) { if (word.isNotBlank()) commit(word + " ") }
-                        else if (index == 0) { skipNextAutoCorrect = true; showToast("Se conservará «$token" + "»") }
+                        else if (index == 0) { skipNextAutoCorrect = true; showToast("Se conservará «$token»") }
                         else replaceCurrentWord(word)
                     }
                 }
@@ -922,6 +941,12 @@ class VozFlowIME : InputMethodService() {
             styleMic(mic)
             mic.layoutParams = LinearLayout.LayoutParams(iconWidth, -1)
             mic.textSize = 16f
+            return
+        }
+
+        bar.tag = "tools_mode"
+        bar.removeAllViews()
+
         } else if (showUndo) {
 
             addToolbarButton(bar, "❖", 0.85f) { showModesPanel() }
