@@ -755,24 +755,26 @@ class VozFlowIME : InputMethodService() {
         if (!clipboardVisible) return
         try { clipboardListener?.let(clipboard::removePrimaryClipChangedListener) }
         catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: retirar listener del portapapeles") }
-        clipboardVisible = false
+                clipboardVisible = false
     }
 
-    private fun getClipboardStore(): ClipboardStore = clipboardStore ?: ClipboardStore(this).also { clipboardStore = it }
-
-    private fun closeClipboardStore() {
-        try { clipboardStore?.close() }
-        catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: cerrar SQLite al ocultar teclado") }
-        clipboardStore = null
-    }
+    private fun getClipboardStore(): ClipboardStore =
+        clipboardStore ?: ClipboardStore(applicationContext).also { clipboardStore = it }
 
     private fun releaseVoiceModelNow() {
-        try { voice?.shutdown() } catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: liberar modelo al ocultar teclado") }
+        val oldController = voice
         voice = null
+        if (oldController != null) {
+            Thread({
+                try { oldController.shutdown() }
+                catch (failure: Exception) { CrashHandler.recordException(this, failure, "VozFlowIME: liberar modelo al ocultar teclado") }
+            }, "vosk-ime-shutdown").start()
+        }
     }
 
     private fun clearTransientUi() {
         main.removeCallbacksAndMessages(null)
+
         deleteHandler.removeCallbacksAndMessages(null)
         dismissKeyPreview()
         activePopup?.dismiss()
