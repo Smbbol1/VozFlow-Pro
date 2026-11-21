@@ -815,8 +815,8 @@ class VozFlowIME : InputMethodService() {
         val hasNextWordContext = token.isEmpty() && currentInputConnection?.getTextBeforeCursor(80, 0)?.toString()?.let { it.isNotBlank() && it.lastOrNull()?.isWhitespace() == true } == true
         val suggestionsOn = !passwordField && prefs.getBoolean("suggestions", true) && !listening && (token.isNotEmpty() || hasNextWordContext)
         val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
-        if (suggestionsOn && !toolbarToolsExpanded && !showUndo) {
-            addToolbarButton(bar, "▦", 0.82f) { showModesPanel() }
+                if (suggestionsOn && !toolbarToolsExpanded && !showUndo) {
+            addToolbarButton(bar, "❖", 0.82f) { showModesPanel() }
             val choices = candidateWords()
             choices.forEachIndexed { index, word ->
                 val candidate = TextView(this).apply {
@@ -836,16 +836,16 @@ class VozFlowIME : InputMethodService() {
                 bar.addView(candidate, LinearLayout.LayoutParams(0, -1, if (index == 1) 1.2f else 1f))
             }
             addToolbarButton(bar, "⇄", 0.82f) { toolbarToolsExpanded = true; rebuildToolbar() }
-            val mic = addToolbarButton(bar, "🎙", 0.9f) { toggleVoice() }
+            val mic = addToolbarButton(bar, "🎤", 0.9f) { toggleVoice() }
             styleMic(mic)
         } else if (showUndo) {
-            addToolbarButton(bar, "▦", 0.85f) { showModesPanel() }
+            addToolbarButton(bar, "❖", 0.85f) { showModesPanel() }
             val undo = addToolbarButton(bar, "↶ Deshacer", 3.8f) { undoAvailableUntil = 0L; undoLastEdit() }
             undo.textSize = 13f
             addToolbarButton(bar, "⇄", 0.85f) { undoAvailableUntil = 0L; toolbarToolsExpanded = false; rebuildToolbar() }
-            val mic = addToolbarButton(bar, "🎙", 0.9f) { toggleVoice() }
+            val mic = addToolbarButton(bar, "🎤", 0.9f) { toggleVoice() }
             styleMic(mic)
-                } else {
+        } else {
                         addToolbarButton(bar, "❖", 0.75f) { if (token.isNotEmpty()) { toolbarToolsExpanded = false; rebuildToolbar() } else showModesPanel() }
             addToolbarButton(bar, "⚙", 0.9f) { if (panelMode == "tools") restoreKeys() else showEditPanel() }
             val clipBtn = addToolbarButton(bar, "◫", 0.9f) { toggleClipboard() }
