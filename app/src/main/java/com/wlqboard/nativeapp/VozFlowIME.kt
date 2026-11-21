@@ -408,17 +408,24 @@ class VozFlowIME : InputMethodService() {
             }
 
 
-                                    val bgDrawable = GradientDrawable().apply {
+                                                val radiusPx = dp(24).toFloat()
+            val bgDrawable = GradientDrawable().apply {
                 setColor(backgroundColor())
-                cornerRadius = dp(24).toFloat()
+                cornerRadius = radiusPx
                 setStroke(dp(1), Color.argb(55, 255, 255, 255))
             }
             card.background = bgDrawable
+            card.outlineProvider = object : android.view.ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: android.graphics.Outline) {
+                    outline.setRoundRect(0, 0, view.width, view.height, radiusPx)
+                }
+            }
             card.clipToOutline = true
             card.clipChildren = true
             card.clipToPadding = true
             card.elevation = dp(12).toFloat()
             card.setPadding(dp(6), dp(4), dp(6), dp(8))
+
 
 
             floatingHandle?.visibility = View.VISIBLE
