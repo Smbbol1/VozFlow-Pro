@@ -381,15 +381,15 @@ class VozFlowIME : InputMethodService() {
                 topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
 
-            val bgDrawable = GradientDrawable().apply {
+                        val bgDrawable = GradientDrawable().apply {
                 setColor(backgroundColor())
-                cornerRadius = dp(18).toFloat()
-                setStroke(dp(1), Color.rgb(60, 55, 50))
+                cornerRadius = dp(24).toFloat()
+                setStroke(1, Color.argb(45, 255, 255, 255))
             }
             card.background = bgDrawable
             card.clipToOutline = false
-            card.elevation = dp(10).toFloat()
-            card.setPadding(dp(4), dp(4), dp(4), dp(4))
+            card.elevation = dp(12).toFloat()
+            card.setPadding(dp(6), dp(4), dp(6), dp(8))
 
             floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
