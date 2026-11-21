@@ -1645,9 +1645,9 @@ class VozFlowIME : InputMethodService() {
 
     private fun hasTextAroundCursor(): Boolean = !currentInputConnection?.getTextBeforeCursor(1, 0).isNullOrEmpty() || !currentInputConnection?.getTextAfterCursor(1, 0).isNullOrEmpty()
 
-    private fun candidateWords(): List<String> {
+        private fun candidateWords(): List<String> {
         val token = currentToken()
-        val personal = readPersonalWords()
+        val personal = personalWordsCache()
         if (token.isEmpty()) {
             val before = currentInputConnection?.getTextBeforeCursor(80, 0)?.toString().orEmpty().trimEnd()
             val previous = before.takeLastWhile { !it.isWhitespace() }
@@ -1655,9 +1655,10 @@ class VozFlowIME : InputMethodService() {
         }
         val corrections = mapOf("qeu" to "que", "donde" to "dónde", "tambien" to "también", "mas" to "más", "teh" to "the", "ola" to "hola")
         val candidates = SpanishPredictionEngine.suggestions(token, personal)
-        val snippetExpansion = readTextSnippets().entries.firstOrNull { it.key.startsWith(token, ignoreCase = true) }?.value
-        val best = corrections[token.lowercase()] ?: SpanishPredictionEngine.autoCorrectCandidate(token, personal) ?: snippetExpansion ?: candidates.getOrElse(1) { token }
-        return listOf(token, best, candidates.getOrElse(2) { best })
+        val snippetExpansion = snippetsCache().entries.firstOrNull { it.key.startsWith(token, ignoreCase = true) }?.value
+        val best = corrections[token.lowercase()] ?: SpanishPredictionEngine.autoCorrectCandidate(token, personal) ?: snippetExpansion ?: candidates.getOrElse(1) { "" }
+        val third = candidates.getOrElse(2) { "" }.let { if (it == best) "" else it }
+        return listOf(token, best, third)
     }
 
     private fun readPersonalWords(): List<String> = try {
