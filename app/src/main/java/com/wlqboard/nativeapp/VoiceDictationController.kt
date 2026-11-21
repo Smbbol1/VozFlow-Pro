@@ -405,10 +405,12 @@ class VoiceDictationController(
             applyVoiceCommands(SpanishPredictionEngine.correct(applyVoiceProfile(rawText), readPersonalWords()))
         }
 
-        if (converted.isBlank()) return
+                if (converted.isBlank()) return
         onUi {
+            if (shuttingDown) return@onUi
             inputConnection()?.let { connection ->
                 val now = System.currentTimeMillis()
+
                 val pause = if (lastVoiceTextAtMs == 0L) Long.MAX_VALUE else (now - lastVoiceTextAtMs).coerceAtLeast(0L)
                 val threshold = preferences.getInt(AUTO_CAP_PAUSE_KEY, DEFAULT_AUTO_CAP_PAUSE_MS).coerceIn(0, 10_000)
                 val cased = capitalizeForPause(connection, converted, pause, threshold)
