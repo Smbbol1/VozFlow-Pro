@@ -1472,13 +1472,14 @@ class VozFlowIME : InputMethodService() {
         val shouldCheckAutocorrect = isBoundary && !passwordField && prefs.getBoolean("autocorrect", true)
         val shouldUpdateSuggestions = !passwordField && prefs.getBoolean("suggestions", true) && !listening
 
-        var text = if (shiftState > 0 && isLetter) value.uppercase() else value
-        val before = if (shouldCheckAutocorrect || shouldUpdateSuggestions) {
-            ic.getTextBeforeCursor(120, 0)?.toString().orEmpty()
+                var text = if (shiftState > 0 && isLetter) value.uppercase() else value
+        val before = if (shouldCheckAutocorrect) {
+            ic.getTextBeforeCursor(80, 0)?.toString().orEmpty()
         } else {
             ""
         }
         val selected = if (shouldCheckAutocorrect) ic.getSelectedText(0)?.toString().orEmpty() else ""
+
         var removedForUndo = selected
         var leftForUndo = before
         var didAutocorrect = false
