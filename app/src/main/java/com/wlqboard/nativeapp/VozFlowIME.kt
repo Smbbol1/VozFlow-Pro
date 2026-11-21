@@ -2018,12 +2018,27 @@ class VozFlowIME : InputMethodService() {
         catch (_: Exception) { showToast("Abre VozFlow Pro desde el lanzador para ver ajustes.") }
     }
 
-    private fun rowLayout() = LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(3); bottomMargin = dp(3) }
-    private fun keyLayout(weight: Float, special: Boolean = false) = LinearLayout.LayoutParams(0, -1, weight).apply {
-        val baseGap = prefs.getInt("key_spacing", 4).coerceIn(1, 8)
-        val gap = if (prefs.getBoolean("big_keys_enabled", false)) (baseGap - 1).coerceAtLeast(1) else baseGap
-        leftMargin = dp((gap / 2).coerceAtLeast(1)); rightMargin = dp((gap / 2).coerceAtLeast(1)); topMargin = dp(2); bottomMargin = dp(2)
+        private fun rowLayout(): LinearLayout.LayoutParams {
+        val vGap = prefs.getInt("key_spacing_v", 6).coerceIn(0, 16)
+        val halfV = dp(vGap) / 2
+        return LinearLayout.LayoutParams(-1, 0, 1f).apply {
+            topMargin = halfV
+            bottomMargin = halfV
+        }
     }
+
+    private fun keyLayout(weight: Float, special: Boolean = false): LinearLayout.LayoutParams {
+        val baseGap = prefs.getInt("key_spacing_h", prefs.getInt("key_spacing", 4)).coerceIn(0, 16)
+        val gap = if (prefs.getBoolean("big_keys_enabled", false)) (baseGap - 1).coerceAtLeast(0) else baseGap
+        val halfH = dp(gap) / 2
+        return LinearLayout.LayoutParams(0, -1, weight).apply {
+            leftMargin = halfH
+            rightMargin = halfH
+            topMargin = 0
+            bottomMargin = 0
+        }
+    }
+
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
     private fun keyRipple(color: Int) = RippleDrawable(
