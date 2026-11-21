@@ -1352,17 +1352,23 @@ class VozFlowIME : InputMethodService() {
                     else -> emptyList()
                 }
                                                 val turbo = prefs.getBoolean("turbo_typing", true)
-                key.setOnTouchListener { v, e ->
+                                key.setOnTouchListener { v, e ->
                     when (e.actionMasked) {
                         MotionEvent.ACTION_DOWN -> {
+                            v.isPressed = true
                             if (!turbo && prefs.getBoolean("key_preview", true)) showKeyPreview(v, label)
                             performKeyboardHaptic(v)
                             commit(value)
                         }
-                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (!turbo) dismissKeyPreview()
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            v.isPressed = false
+                            v.jumpDrawablesToCurrentState()
+                            if (!turbo) dismissKeyPreview()
+                        }
                     }
                     false
                 }
+
 
                 if (accents.isNotEmpty()) {
                     key.setOnLongClickListener {
