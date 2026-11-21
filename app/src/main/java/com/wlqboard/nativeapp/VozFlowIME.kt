@@ -859,13 +859,30 @@ class VozFlowIME : InputMethodService() {
         }
     }
 
-        private fun rebuildToolbar() {
+            private fun rebuildToolbar() {
         val bar = toolbar ?: return
         bar.removeAllViews()
         bar.setBackgroundColor(if (floatingMode) Color.TRANSPARENT else backgroundColor())
         suggestionBar?.visibility = View.GONE
 
+        if (listening) {
+            addToolbarButton(bar, "❖", 0.85f) { stopVoice(); showModesPanel() }
+            val listeningBanner = TextView(this).apply {
+                text = "🎙 Escuchando…"
+                gravity = Gravity.CENTER
+                textSize = 14f
+                setTypeface(typeface, Typeface.BOLD)
+                setTextColor(Color.rgb(130, 220, 145))
+                setOnClickListener { stopVoice() }
+            }
+            bar.addView(listeningBanner, LinearLayout.LayoutParams(0, -1, 4.35f))
+            val mic = addToolbarButton(bar, "🎤", 0.9f) { toggleVoice() }
+            styleMic(mic)
+            return
+        }
+
         val token = currentToken()
+
         val hasNextWordContext = token.isEmpty() && currentInputConnection?.getTextBeforeCursor(80, 0)?.toString()?.let { it.isNotBlank() && it.lastOrNull()?.isWhitespace() == true } == true
         val suggestionsOn = !passwordField && prefs.getBoolean("suggestions", true) && !listening && (token.isNotEmpty() || hasNextWordContext)
         val showUndo = SystemClock.uptimeMillis() < undoAvailableUntil
