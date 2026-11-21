@@ -420,11 +420,13 @@ class VoiceDictationController(
         }
     }
 
-    private fun showComposingText(rawText: String) {
+        private fun showComposingText(rawText: String) {
         val converted = applyVoiceCommands(rawText)
         onUi {
+            if (!running || shuttingDown) return@onUi
             inputConnection()?.let { connection ->
                 val now = System.currentTimeMillis()
+
                 val pause = if (lastVoiceTextAtMs == 0L) Long.MAX_VALUE else (now - lastVoiceTextAtMs).coerceAtLeast(0L)
                 val threshold = preferences.getInt(AUTO_CAP_PAUSE_KEY, DEFAULT_AUTO_CAP_PAUSE_MS).coerceIn(0, 10_000)
                 connection.setComposingText(capitalizeForPause(connection, converted, pause, threshold), 1)
