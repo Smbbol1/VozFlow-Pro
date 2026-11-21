@@ -1098,11 +1098,16 @@ class VozFlowIME : InputMethodService() {
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> MotionEvent.ACTION_UP
                 else -> MotionEvent.ACTION_MOVE
             }
-            val forwarded = MotionEvent.obtain(event.downTime, event.eventTime, sourceAction, x, y, event.metaState)
+                        val forwarded = MotionEvent.obtain(event.downTime, event.eventTime, sourceAction, x, y, event.metaState)
             child.dispatchTouchEvent(forwarded)
             forwarded.recycle()
+            if (sourceAction == MotionEvent.ACTION_UP || sourceAction == MotionEvent.ACTION_CANCEL) {
+                child.isPressed = false
+                child.jumpDrawablesToCurrentState()
+            }
         }
     }
+
 
     private fun newKeyRow() = KeyTouchRow().apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
 
