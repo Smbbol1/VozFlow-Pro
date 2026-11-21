@@ -1336,10 +1336,8 @@ class VozFlowIME : InputMethodService() {
                 key.setOnClickListener { commit(".") }
                 key.setOnLongClickListener { dismissKeyPreview(); showPopup(key, listOf(",", "?", "!", "¿", "¡", "@")); true }
             }
-            KeyKind.ACTION -> key.setOnClickListener { performKeyboardHaptic(key); performAction() }
-                        KeyKind.CHAR -> {
-                // ELIMINADO el OnClickListener porque ahora se escribe en el OnTouchListener (ACTION_DOWN)
-                // key.setOnClickListener { commit(value) } 
+                        KeyKind.ACTION -> key.setOnClickListener { performKeyboardHaptic(key); performAction() }
+            KeyKind.CHAR -> {
                 val accents = when (value.lowercase()) {
                     "a" -> listOf("á", "à", "â", "ä")
                     "e" -> listOf("é", "è", "ê", "ë")
@@ -1348,10 +1346,34 @@ class VozFlowIME : InputMethodService() {
                     "u" -> listOf("ú", "ù", "û", "ü")
                     else -> emptyList()
                 }
-                if (accents.isNotEmpty()) key.setOnLongClickListener { dismissKeyPreview(); showPopup(key, accents); true }
+                var longPressed = false
+                key.setOnTouchListener { v, e ->
+                    when (e.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            longPressed = false
+                            if (prefs.getBoolean("key_preview", true)) showKeyPreview(v, label)
+                            if (accents.isEmpty()) { performKeyboardHaptic(v); commit(value) }
+                        }
+                        MotionEvent.ACTION_UP -> {
+                            dismissKeyPreview()
+                            if (accents.isNotEmpty() && !longPressed) { performKeyboardHaptic(v); commit(value) }
+                        }
+                        MotionEvent.ACTION_CANCEL -> dismissKeyPreview()
+                    }
+                    false
+                }
+                if (accents.isNotEmpty()) {
+                    key.setOnLongClickListener {
+                        longPressed = true
+                        dismissKeyPreview()
+                        showPopup(key, if (shiftState > 0) accents.map { it.uppercase() } else accents)
+                        true
+                    }
+                }
             }
         }
         return key
+
     }
 
     private var lastSwipeWordCount = 0
