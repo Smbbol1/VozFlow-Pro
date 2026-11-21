@@ -693,7 +693,7 @@ class VozFlowIME : InputMethodService() {
         super.onFinishInputView(finishingInput)
     }
 
-    override fun onWindowHidden() {
+        override fun onWindowHidden() {
         unregisterClipboardListener()
         stopVoice()
         modelReleaseHandler.removeCallbacks(releaseModelRunnable)
@@ -703,7 +703,19 @@ class VozFlowIME : InputMethodService() {
         super.onWindowHidden()
     }
 
+    override fun onEvaluateFullscreenMode(): Boolean = false
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        root?.post {
+            root?.let(::applyKeyboardHeight)
+            clampFloatingCard(false)
+            rebuildKeys()
+        }
+    }
+
     override fun onComputeInsets(outInsets: Insets) {
+
         super.onComputeInsets(outInsets)
         try {
             val decor = getWindow().window?.decorView
