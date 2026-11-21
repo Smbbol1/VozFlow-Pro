@@ -2198,8 +2198,7 @@ class VozFlowIME : InputMethodService() {
     private fun accentColor(): Int {
         val colors = listOf("#D8A76A", "#D88772", "#8AAE9B", "#8CA7D0")
         return try { Color.parseColor(colors[prefs.getInt("accent_index", 0).coerceIn(0, colors.lastIndex)]) } catch (_: Exception) { Color.rgb(216, 167, 106) }
-    }
+        }
     private fun showToast(value: String) = Toast.makeText(this, value, Toast.LENGTH_SHORT).show()
-
-    companion object { private const val IMAGE_CLIP_PREFIX = "__VOICEFLOW_IMAGE__:" }
 }
+
