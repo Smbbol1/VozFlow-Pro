@@ -255,11 +255,13 @@ class VoiceDictationController(
         }
     }
 
-    @Throws(IOException::class)
+        @Throws(IOException::class)
     private fun ensureModel(): Model {
-        synchronized(audioLock) {
+        model?.let { return it }
+        synchronized(modelLock) {
             model?.let { return it }
             if (shuttingDown) throw IOException("El controlador de dictado ya fue cerrado.")
+
             val marker = File(modelDirectory, MODEL_COMPLETE_MARKER)
             if (!marker.isFile) {
                 deleteRecursively(modelDirectory)
