@@ -321,11 +321,12 @@ class VoiceDictationController(
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT
         )
-        if (minBytes <= 0) throw IOException("El dispositivo no admite captura PCM mono a 16 kHz.")
-        val bufferBytes = maxOf(minBytes * 2, BUFFER_SAMPLES * BYTES_PER_SAMPLE)
+                if (minBytes <= 0) throw IOException("El dispositivo no admite captura PCM mono a 16 kHz.")
+        val bufferBytes = maxOf(minBytes, BUFFER_SAMPLES * BYTES_PER_SAMPLE * 2)
         val record = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.VOICE_RECOGNITION,
             SAMPLE_RATE,
+
             AudioFormat.CHANNEL_IN_MONO,
             AudioFormat.ENCODING_PCM_16BIT,
             bufferBytes
