@@ -188,13 +188,14 @@ class VozFlowIME : InputMethodService() {
             sizePositionHandle = view.findViewById(R.id.ime_size_position_handle)
             keyRows = view.findViewById(R.id.ime_key_rows)
             if (keyboardCard == null || toolbar == null || suggestionBar == null || floatingHandle == null || keyRows == null) throw IllegalStateException("Faltan contenedores del layout del teclado")
-                        floatingMode = prefs.getBoolean("floating_mode", false)
+                                    floatingMode = prefs.getBoolean("floating_mode", false)
             floatingX = dp(prefs.getInt("floating_x_dp", 0))
             floatingY = dp(prefs.getInt("floating_y_dp", 0))
-            floatingWidthPercent = prefs.getInt("floating_width_percent", 78).coerceIn(45, 100)
-            floatingHeightPercent = prefs.getInt("floating_height_percent", 100).coerceIn(65, 180)
+            floatingWidthPercent = prefs.getInt("floating_width_percent", 78).coerceIn(12, 100)
+            floatingHeightPercent = prefs.getInt("floating_height_percent", 100).coerceIn(16, 180)
 
             applyKeyboardHeight(view)
+
             installWindowGestureHandles()
             installSizeEditorControls()
             rebuildToolbar()
