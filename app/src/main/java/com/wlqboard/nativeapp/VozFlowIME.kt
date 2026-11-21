@@ -1206,24 +1206,11 @@ class VozFlowIME : InputMethodService() {
                 KeyKind.ACTION -> actionColor()
                 else -> specialColor()
             })
-            tag = value
+                        tag = value
             setPadding(dp(2), dp(2), dp(2), dp(2))
-            if (prefs.getBoolean("key_preview", true)) setOnTouchListener { v, e ->
-                if (e.action == MotionEvent.ACTION_DOWN) {
-                    showKeyPreview(v, label)
-                    // Si es una letra, escribimos INMEDIATAMENTE al tocar para quitar el lag
-                    if (kind == KeyKind.CHAR) {
-                        v.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
-                        commit(value)
-                    }
-                }
-                if (e.action == MotionEvent.ACTION_UP || e.action == MotionEvent.ACTION_CANCEL) {
-                    dismissKeyPreview()
-                }
-                false
-            }
         }
         when (kind) {
+
             KeyKind.SHIFT -> {
                 if (shiftState == 2) key.background = keyRipple(accentColor())
                 key.setOnClickListener { performKeyboardHaptic(key); toggleShift(); rebuildKeys(); rebuildToolbar() }
