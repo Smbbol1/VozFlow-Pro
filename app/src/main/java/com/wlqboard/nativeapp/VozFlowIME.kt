@@ -290,34 +290,58 @@ class VozFlowIME : InputMethodService() {
         }
         dragHandle?.setOnTouchListener(moveCard)
         floatingBottomDrag?.setOnTouchListener(moveCard)
-        var startWidthPercent = floatingWidthPercent
+                var startWidthPercent = floatingWidthPercent
         var startHeightPercent = floatingHeightPercent
-                resizeHandle?.setOnTouchListener { _, event ->
+        var startX = 0
+        var isLeftHandle = false
+        resizeHandle?.setOnTouchListener { handleView, event ->
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     startWidthPercent = floatingWidthPercent
                     startHeightPercent = floatingHeightPercent
-                    downRawX = event.rawX; downRawY = event.rawY
+                    startX = floatingX
+                    downRawX = event.rawX
+                    downRawY = event.rawY
+                    val loc = IntArray(2)
+                    handleView.getLocationOnScreen(loc)
+                    val cardLoc = IntArray(2)
+                    keyboardCard?.getLocationOnScreen(cardLoc)
+                    isLeftHandle = loc[0] < (cardLoc[0] + (keyboardCard?.width ?: 0) / 2)
                     floatingMode
                 }
                 MotionEvent.ACTION_MOVE -> {
                     if (!floatingMode) return@setOnTouchListener false
-                    // Calculamos el nuevo ancho y alto sin límites (solo mínimo de 10% para que no desaparezca)
-                    val newWidth = (startWidthPercent + ((event.rawX - downRawX) * 100f / resources.displayMetrics.widthPixels).toInt()).coerceAtLeast(10)
-                    val newHeight = (startHeightPercent + ((event.rawY - downRawY) * 100f / dp(270)).toInt()).coerceAtLeast(10)
-                    
-                    floatingWidthPercent = newWidth
-                    floatingHeightPercent = newHeight
-                    
-                    prefs.edit().putInt("floating_width_percent", floatingWidthPercent).putInt("floating_height_percent", floatingHeightPercent).apply()
-                    root?.let(::applyKeyboardHeight)
-                    rebuildKeys()
+                    val screenW = resources.displayMetrics.widthPixels.toFloat()
+                    val deltaX = if (isLeftHandle) (downRawX - event.rawX) else (event.rawX - downRawX)
+                    val deltaY = event.rawY - downRawY
+
+                    val newWidth = (startWidthPercent + (deltaX * 100f / screenW).toInt()).coerceIn(45, 100)
+                    val newHeight = (startHeightPercent + (deltaY * 100f / dp(270)).toInt()).coerceIn(65, 180)
+
+                    if (newWidth != floatingWidthPercent || newHeight != floatingHeightPercent) {
+                        if (isLeftHandle) {
+                            val widthDiffPx = ((newWidth - startWidthPercent) * screenW / 100f).toInt()
+                            floatingX = (startX - widthDiffPx).coerceIn(0, (screenW - (screenW * newWidth / 100f)).toInt())
+                        }
+                        floatingWidthPercent = newWidth
+                        floatingHeightPercent = newHeight
+                        root?.let(::applyKeyboardHeight)
+                        rebuildKeys()
+                    }
                     true
                 }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> { clampFloatingCard(true); true }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    clampFloatingCard(true)
+                    prefs.edit()
+                        .putInt("floating_width_percent", floatingWidthPercent)
+                        .putInt("floating_height_percent", floatingHeightPercent)
+                        .apply()
+                    true
+                }
                 else -> false
             }
         }
+
     }
 
     private fun setFloatingMode(enabled: Boolean) {
