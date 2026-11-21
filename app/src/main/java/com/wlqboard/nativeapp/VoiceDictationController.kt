@@ -38,22 +38,35 @@ class VoiceDictationController(
         "${appContext.packageName}_preferences",
         Context.MODE_PRIVATE
     )
-    private val audioLock = Any()
+        private val audioLock = Any()
+    private val modelLock = Any()
     private val uiHandler = Handler(Looper.getMainLooper())
 
     @Volatile private var running = false
     @Volatile private var shuttingDown = false
+    @Volatile private var preloading = false
     private var worker: Thread? = null
-    private var model: Model? = null
+    @Volatile private var model: Model? = null
     @Volatile private var lastVoiceTextAtMs = 0L
 
-    // These are published/released together under audioLock. The worker may be in read()
-    // while stop() releases the recorder; that is intentional so stop does not wait for IO.
     private var audioRecord: AudioRecord? = null
     private var noiseSuppressor: NoiseSuppressor? = null
     private var automaticGainControl: AutomaticGainControl? = null
 
+    init {
+        preload()
+    }
+
+    fun preload() {
+        if (shuttingDown || model != null || preloading) return
+        preloading = true
+        Thread({
+            try { ensureModel() } catch (_: Exception) { } finally { preloading = false }
+        }, "vosk-model-preload").start()
+    }
+
     /** Starts one recording session. Calls while a session is active are ignored. */
+
     fun start() {
         synchronized(audioLock) {
             if (shuttingDown || running || worker?.isAlive == true) return
