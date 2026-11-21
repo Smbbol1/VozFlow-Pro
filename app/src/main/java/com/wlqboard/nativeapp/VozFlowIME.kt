@@ -2244,11 +2244,19 @@ class VozFlowIME : InputMethodService() {
 
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     private fun rounded(color: Int, radius: Int) = GradientDrawable().apply { setColor(color); cornerRadius = dp(radius).toFloat() }
-    private fun keyRipple(color: Int) = RippleDrawable(
-        ColorStateList.valueOf(Color.argb(85, Color.red(accentColor()), Color.green(accentColor()), Color.blue(accentColor()))),
-        rounded(color, 6),
-        rounded(Color.WHITE, 6)
-    )
+        private fun keyRipple(color: Int): android.graphics.drawable.StateListDrawable {
+        val pressedColor = Color.argb(
+            255,
+            ((Color.red(color) + Color.red(accentColor())) / 2),
+            ((Color.green(color) + Color.green(accentColor())) / 2),
+            ((Color.blue(color) + Color.blue(accentColor())) / 2)
+        )
+        return android.graphics.drawable.StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), rounded(pressedColor, 6))
+            addState(intArrayOf(), rounded(color, 6))
+        }
+    }
+
     private fun circle(color: Int) = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(color) }
     private fun currentTheme() = prefs.getString("keyboard_theme", "warm") ?: "warm"
     private fun backgroundColor() = when (currentTheme()) { "light" -> Color.rgb(236, 239, 241); "amoled" -> Color.BLACK; else -> Color.rgb(26, 25, 24) }
