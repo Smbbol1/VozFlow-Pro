@@ -104,10 +104,12 @@ class MainActivity : Activity() {
             text("Español (QWERTY con Ñ)", 16, true)
             text("Diseño activo · Español", 13, false, muted)
         }
-        addSection("🎛", "Preferencias") {
+                addSection("🎛", "Preferencias") {
             addSeek("Altura del teclado", "height_percent", 70, 145, 100, "%")
-            addSeek("Espaciado horizontal", "key_spacing", 1, 8, 4, " dp")
+            addSeek("Espaciado horizontal (entre letras)", "key_spacing_h", 0, 16, 4, " dp")
+            addSeek("Espaciado vertical (entre filas)", "key_spacing_v", 0, 16, 6, " dp")
             addSeek("Tamaño de letra", "key_font_size", 14, 26, 19, " sp")
+
             addToggle("Modo dedos grandes / Evitar errores de pulsación", "big_keys_enabled", false)
             addSeek("Ampliación de teclas", "big_keys_scale", 100, 150, 120, "%")
             addSeek("Sensibilidad táctil", "touch_sensitivity", 1, 10, 5, " / 10")
