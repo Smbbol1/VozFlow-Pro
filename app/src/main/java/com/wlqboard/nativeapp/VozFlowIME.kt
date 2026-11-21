@@ -389,17 +389,18 @@ class VozFlowIME : InputMethodService() {
             host.layoutParams = FrameLayout.LayoutParams(-1, baseHeight)
             return
         }
-        if (floatingMode) {
+                if (floatingMode) {
             val screenW = resources.displayMetrics.widthPixels
             val screenH = resources.displayMetrics.heightPixels
-            val safeWidthPercent = floatingWidthPercent.coerceIn(45, 100)
-            val safeHeightPercent = floatingHeightPercent.coerceIn(65, 180)
-            val width = (screenW * safeWidthPercent / 100).coerceIn(dp(180), screenW)
+            val safeWidthPercent = floatingWidthPercent.coerceIn(12, 100)
+            val safeHeightPercent = floatingHeightPercent.coerceIn(16, 180)
+            val width = (screenW * safeWidthPercent / 100).coerceIn(dp(52), screenW)
             val editExtra = if (sizeEditing) dp(56) else 0
             val maxAllowedHeight = (screenH * 0.75f).toInt()
-            val height = ((baseHeight + editExtra) * safeHeightPercent / 100).coerceIn(dp(190), maxAllowedHeight)
+            val height = ((baseHeight + editExtra) * safeHeightPercent / 100).coerceIn(dp(52), maxAllowedHeight)
 
             host.layoutParams = FrameLayout.LayoutParams(-1, screenH)
+
             card.layoutParams = FrameLayout.LayoutParams(width, height).apply {
                 gravity = Gravity.TOP or Gravity.LEFT
                 leftMargin = floatingX.coerceIn(0, (screenW - width).coerceAtLeast(0))
