@@ -556,9 +556,10 @@ class VoiceDictationController(
     companion object {
         private const val MODEL_ASSET_DIRECTORY = "vosk-model-small-es-0.42"
         private const val MODEL_COMPLETE_MARKER = ".copy_complete"
-        private const val SAMPLE_RATE = 16_000
-        private const val BUFFER_SAMPLES = 4_000
-        private const val BYTES_PER_SAMPLE = 2
+                private const val DEFAULT_SILENCE_TIMEOUT_MS = 3_500L
+        private const val VOICE_RMS_THRESHOLD = 0.012
+        private const val AMPLITUDE_FULL_SCALE_RMS = 0.20
+
         private const val NOISE_SUPPRESSION_KEY = "noise_suppression"
         private const val SILENCE_TIMEOUT_KEY = "silence_timeout_ms"
         private const val AUTO_CAP_PAUSE_KEY = "voice_auto_caps_pause_ms"
