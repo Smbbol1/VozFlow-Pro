@@ -1526,10 +1526,15 @@ class VozFlowIME : InputMethodService() {
             }
         }
 
-                if (shouldUpdateSuggestions) {
+                        if (shouldUpdateSuggestions) {
             toolbarToolsExpanded = false
-            rebuildToolbar()
+            main.removeCallbacks(updateToolbarRunnable)
+            main.postDelayed(updateToolbarRunnable, 65L)
         }
+    }
+
+    private val updateToolbarRunnable = Runnable {
+        if (root != null && !listening) rebuildToolbar()
     }
 
 
