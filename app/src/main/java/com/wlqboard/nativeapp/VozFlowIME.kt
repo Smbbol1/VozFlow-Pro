@@ -1079,12 +1079,16 @@ class VozFlowIME : InputMethodService() {
             val d1 = kotlin.math.abs(x - (sorted[1].left + sorted[1].width / 2f))
             val sensitivity = prefs.getInt("touch_sensitivity", 5).coerceIn(1, 10)
             val ambiguous = kotlin.math.abs(d0 - d1) <= dp(4 + sensitivity)
-            if (ambiguous && currentToken().isNotEmpty()) {
-                val scores = SpanishPredictionEngine.nextLetterScores(currentToken(), readPersonalWords())
-                val score0 = scores[(sorted[0].tag as? String)?.firstOrNull()?.lowercaseChar()] ?: 0
-                val score1 = scores[(sorted[1].tag as? String)?.firstOrNull()?.lowercaseChar()] ?: 0
-                if (score0 != score1) return if (score0 > score1) sorted[0] else sorted[1]
+                        if (ambiguous) {
+                val token = currentToken()
+                if (token.isNotEmpty()) {
+                    val scores = SpanishPredictionEngine.nextLetterScores(token, personalWordsCache())
+                    val score0 = scores[(sorted[0].tag as? String)?.firstOrNull()?.lowercaseChar()] ?: 0
+                    val score1 = scores[(sorted[1].tag as? String)?.firstOrNull()?.lowercaseChar()] ?: 0
+                    if (score0 != score1) return if (score0 > score1) sorted[0] else sorted[1]
+                }
             }
+
             return nearest
         }
 
