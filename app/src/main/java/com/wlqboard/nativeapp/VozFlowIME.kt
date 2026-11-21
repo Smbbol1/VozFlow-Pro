@@ -444,14 +444,15 @@ class VozFlowIME : InputMethodService() {
                         }
                         handleGroup.addView(btn, lp)
                     }
-                    btn.visibility = View.VISIBLE
+                                        btn.visibility = View.VISIBLE
                 }
             }
 
-            getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            getWindow().window?.setLayout(-1, screenH)
+            window?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            window?.window?.setLayout(-1, screenH)
         } else {
             val width: Int
+
             val gravity: Int
             when (oneHand) {
                 "right" -> { width = (resources.displayMetrics.widthPixels * 0.82f).toInt(); gravity = Gravity.BOTTOM or Gravity.RIGHT }
