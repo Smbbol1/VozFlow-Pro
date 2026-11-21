@@ -363,50 +363,52 @@ class VozFlowIME : InputMethodService() {
             host.layoutParams = FrameLayout.LayoutParams(-1, baseHeight)
             return
         }
-                if (floatingMode) {
+                        if (floatingMode) {
             val screenW = resources.displayMetrics.widthPixels
             val screenH = resources.displayMetrics.heightPixels
-            // Permitimos que el ancho vaya desde un 10% hasta el 100% de la pantalla
-            val width = (screenW * floatingWidthPercent / 100).coerceIn(dp(100), screenW)
+            val safeWidthPercent = floatingWidthPercent.coerceIn(60, 95)
+            val safeHeightPercent = floatingHeightPercent.coerceIn(70, 145)
+            val width = (screenW * safeWidthPercent / 100).coerceIn(dp(220), screenW)
             val editExtra = if (sizeEditing) dp(56) else 0
-            // Permitimos que el alto sea libre
-            val height = ((baseHeight + editExtra) * floatingHeightPercent / 100).coerceAtLeast(dp(100))
-            
+            val height = ((baseHeight + editExtra) * safeHeightPercent / 100).coerceAtLeast(dp(220))
+
             host.layoutParams = FrameLayout.LayoutParams(-1, screenH)
             card.layoutParams = FrameLayout.LayoutParams(width, height).apply {
                 gravity = Gravity.TOP or Gravity.LEFT
-                // Recuperamos la posición guardada en preferencias si existe
                 val savedX = prefs.getInt("floating_x_dp", 0)
                 val savedY = prefs.getInt("floating_y_dp", 0)
                 leftMargin = if (savedX > 0) dp(savedX) else floatingX
                 topMargin = if (savedY > 0) dp(savedY) else floatingY
             }
-                                                // FORZAR BORDES REDONDEADOS SIN USAR OUTLINEPROVIDER (Más rápido)
+
             val bgDrawable = GradientDrawable().apply {
                 setColor(backgroundColor())
                 cornerRadius = dp(18).toFloat()
                 setStroke(dp(1), Color.rgb(60, 55, 50))
             }
             card.background = bgDrawable
-            card.clipToOutline = false // Desactivamos el recorte pesado
+            card.clipToOutline = false
             card.elevation = dp(10).toFloat()
-            
-            // Aseguramos que los márgenes internos no se salgan de los bordes
             card.setPadding(dp(4), dp(4), dp(4), dp(4))
-            
+
             floatingHandle?.visibility = View.VISIBLE
             floatingBottom?.visibility = View.VISIBLE
-            
-            // AÑADIR EL BOTÓN A LA BARRA SUPERIOR SIN ROMPER EL ARRASTRE
+
+            // Insertar la flecha dentro de floatingHandle (sin desplazarnos fuera de la tarjeta)
             closeFloatingBtn?.let { btn ->
-                val parentBar = floatingHandle?.parent as? ViewGroup
-                if (parentBar != null && btn.parent == null) {
-                    // Lo insertamos al principio de la barra de arrastre
-                    parentBar.addView(btn, 0, ViewGroup.LayoutParams(dp(48), ViewGroup.LayoutParams.MATCH_PARENT))
+                val handleGroup = floatingHandle as? ViewGroup
+                if (handleGroup != null) {
+                    if (btn.parent != handleGroup) {
+                        (btn.parent as? ViewGroup)?.removeView(btn)
+                        val lp = FrameLayout.LayoutParams(dp(44), ViewGroup.LayoutParams.MATCH_PARENT).apply {
+                            gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL
+                        }
+                        handleGroup.addView(btn, lp)
+                    }
+                    btn.visibility = View.VISIBLE
                 }
-                btn.visibility = View.VISIBLE
             }
-            
+
             getWindow().window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             getWindow().window?.setLayout(-1, screenH)
         } else {
