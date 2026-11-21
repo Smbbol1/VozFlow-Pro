@@ -1751,25 +1751,35 @@ class VozFlowIME : InputMethodService() {
         popup.showAsDropDown(anchor, 0, -dp(68))
     }
 
-    private fun showKeyPreview(anchor: View, label: String) {
-        dismissKeyPreview()
-        val preview = TextView(this).apply {
+        private fun showKeyPreview(anchor: View, label: String) {
+        val window = previewWindow ?: PopupWindow(
+            TextView(this).apply {
+                gravity = Gravity.CENTER
+                textSize = 25f
+            },
+            dp(48),
+            dp(54),
+            false
+        ).apply {
+            elevation = dp(5).toFloat()
+            previewWindow = this
+        }
+        (window.contentView as? TextView)?.apply {
             text = label
-            gravity = Gravity.CENTER
-            textSize = 25f
             setTextColor(textColor())
             background = rounded(specialColor(), 12)
         }
-        previewWindow = PopupWindow(preview, dp(48), dp(54), false).apply {
-            elevation = dp(5).toFloat()
-            showAsDropDown(anchor, 0, -dp(62))
+        if (window.isShowing) {
+            window.update(anchor, 0, -dp(62), dp(48), dp(54))
+        } else {
+            window.showAsDropDown(anchor, 0, -dp(62))
         }
     }
 
     private fun dismissKeyPreview() {
-        previewWindow?.dismiss()
-        previewWindow = null
+        if (previewWindow?.isShowing == true) previewWindow?.dismiss()
     }
+
 
     private fun toggleVoice() {
         if (listening) { stopVoice(); return }
