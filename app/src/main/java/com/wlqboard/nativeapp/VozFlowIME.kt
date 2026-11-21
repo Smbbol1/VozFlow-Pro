@@ -2127,19 +2127,20 @@ class VozFlowIME : InputMethodService() {
         }
     }
 
-    private fun openSettings() {
+        private fun openSettings() {
         try { startActivity(packageManager.getLaunchIntentForPackage(packageName)?.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }
         catch (_: Exception) { showToast("Abre VozFlow Pro desde el lanzador para ver ajustes.") }
     }
 
-        private fun rowLayout(): LinearLayout.LayoutParams {
+    private fun rowLayout(weight: Float = 1f): LinearLayout.LayoutParams {
         val vGap = prefs.getInt("key_spacing_v", 6).coerceIn(0, 16)
         val halfV = dp(vGap) / 2
-        return LinearLayout.LayoutParams(-1, 0, 1f).apply {
+        return LinearLayout.LayoutParams(-1, 0, weight).apply {
             topMargin = halfV
             bottomMargin = halfV
         }
     }
+
 
     private fun keyLayout(weight: Float, special: Boolean = false): LinearLayout.LayoutParams {
         val baseGap = prefs.getInt("key_spacing_h", prefs.getInt("key_spacing", 4)).coerceIn(0, 16)
