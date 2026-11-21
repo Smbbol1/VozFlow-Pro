@@ -1066,17 +1066,58 @@ class VozFlowIME : InputMethodService() {
         parent.addView(row, rowLayout())
     }
 
-    private fun addBottomRow(parent: LinearLayout) {
+        private fun addBottomRow(parent: LinearLayout) {
         val row = newKeyRow()
-        row.addView(makeKey(if (symbolPage == 0) "?123" else "ABC", KeyKind.SYMBOL_TOGGLE, ""), keyLayout(1.15f, true))
-        row.addView(makeKey(if (urlField) "/" else ",", KeyKind.CONTEXT, if (urlField) "/" else ","), keyLayout(0.8f, true))
-        row.addView(makeKey("☺", KeyKind.EMOJI, ""), keyLayout(0.8f, true))
-        row.addView(makeKey(prefs.getString("free_symbol", "@") ?: "@", KeyKind.SYMBOL_FREE, ""), keyLayout(0.8f, true))
-        row.addView(makeKey("Español", KeyKind.SPACE, " "), keyLayout(3.1f))
-        row.addView(makeKey(".", KeyKind.PERIOD, "."), keyLayout(0.8f, true))
-        row.addView(makeKey(actionLabel(), KeyKind.ACTION, ""), keyLayout(1.2f, true))
+        val showSymbols = prefs.getBoolean("bottom_key_symbols", true)
+        val showComma = prefs.getBoolean("bottom_key_comma", true)
+        val showEmoji = prefs.getBoolean("bottom_key_emoji", true)
+        val showFreeSymbol = prefs.getBoolean("bottom_key_free_symbol", true)
+        val showSpace = prefs.getBoolean("bottom_key_space", true)
+        val showPeriod = prefs.getBoolean("bottom_key_period", true)
+        val showEnter = prefs.getBoolean("bottom_key_enter", true)
+
+        // Si el usuario apaga absolutamente todas, dejamos Enter para no romper la fila
+        val anyVisible = showSymbols || showComma || showEmoji || showFreeSymbol || showSpace || showPeriod || showEnter
+
+        // Peso base de las teclas laterales visibles
+        val sideBaseWeights = mutableListOf<Float>()
+        if (showSymbols) sideBaseWeights.add(1.15f)
+        if (showComma) sideBaseWeights.add(0.80f)
+        if (showEmoji) sideBaseWeights.add(0.80f)
+        if (showFreeSymbol) sideBaseWeights.add(0.80f)
+        if (showPeriod) sideBaseWeights.add(0.80f)
+        if (showEnter || !anyVisible) sideBaseWeights.add(1.20f)
+
+        val totalSideBase = sideBaseWeights.sum().coerceAtLeast(0.01f)
+        val spaceRatio = if (showSpace) (prefs.getInt("space_bar_weight", 38).coerceIn(15, 65) / 100f) else 0f
+        val remainingRatio = (1f - spaceRatio).coerceAtLeast(0.15f)
+
+        fun scaledSideWeight(base: Float): Float = (base / totalSideBase) * remainingRatio
+
+        if (showSymbols) {
+            row.addView(makeKey(if (symbolPage == 0) "?123" else "ABC", KeyKind.SYMBOL_TOGGLE, ""), keyLayout(scaledSideWeight(1.15f), true))
+        }
+        if (showComma) {
+            row.addView(makeKey(if (urlField) "/" else ",", KeyKind.CONTEXT, if (urlField) "/" else ","), keyLayout(scaledSideWeight(0.80f), true))
+        }
+        if (showEmoji) {
+            row.addView(makeKey("☺", KeyKind.EMOJI, ""), keyLayout(scaledSideWeight(0.80f), true))
+        }
+        if (showFreeSymbol) {
+            row.addView(makeKey(prefs.getString("free_symbol", "@") ?: "@", KeyKind.SYMBOL_FREE, ""), keyLayout(scaledSideWeight(0.80f), true))
+        }
+        if (showSpace) {
+            row.addView(makeKey("Español", KeyKind.SPACE, " "), keyLayout(spaceRatio))
+        }
+        if (showPeriod) {
+            row.addView(makeKey(".", KeyKind.PERIOD, "."), keyLayout(scaledSideWeight(0.80f), true))
+        }
+        if (showEnter || !anyVisible) {
+            row.addView(makeKey(actionLabel(), KeyKind.ACTION, ""), keyLayout(scaledSideWeight(1.20f), true))
+        }
         parent.addView(row, rowLayout())
     }
+
 
     private fun buildNumericPad(parent: LinearLayout) {
         val matrix = listOf(listOf("1", "2", "3"), listOf("4", "5", "6"), listOf("7", "8", "9"), listOf("*", "0", "#", "⌫"))
