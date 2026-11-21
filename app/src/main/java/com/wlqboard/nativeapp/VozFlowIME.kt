@@ -1501,9 +1501,15 @@ class VozFlowIME : InputMethodService() {
 
     private fun displayed(key: String): String = if (shiftState > 0) key.uppercase() else key
 
-    private fun performKeyboardHaptic(view: View?) {
-        if (prefs.getBoolean("haptics", true)) view?.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
+        private fun performKeyboardHaptic(view: View?) {
+        if (prefs.getBoolean("haptics", true)) {
+            view?.performHapticFeedback(
+                android.view.HapticFeedbackConstants.KEYBOARD_TAP,
+                android.view.HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING
+            )
+        }
     }
+
 
     private fun commit(value: String) {
         val ic = currentInputConnection ?: return
