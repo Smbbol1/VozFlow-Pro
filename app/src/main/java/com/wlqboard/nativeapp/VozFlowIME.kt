@@ -862,14 +862,16 @@ class VozFlowIME : InputMethodService() {
         }
     }
 
-            private fun rebuildToolbar() {
+                private fun rebuildToolbar() {
         val bar = toolbar ?: return
-        bar.removeAllViews()
         bar.setBackgroundColor(if (floatingMode) Color.TRANSPARENT else backgroundColor())
         suggestionBar?.visibility = View.GONE
 
         if (listening) {
+            bar.tag = "listening_mode"
+            bar.removeAllViews()
             addToolbarButton(bar, "❖", 0.85f) { stopVoice(); showModesPanel() }
+
             val listeningBanner = TextView(this).apply {
                 text = "🎙 Escuchando…"
                 gravity = Gravity.CENTER
