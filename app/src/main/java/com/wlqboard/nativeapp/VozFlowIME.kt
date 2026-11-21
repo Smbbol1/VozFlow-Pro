@@ -851,7 +851,7 @@ class VozFlowIME : InputMethodService() {
             val clipBtn = addToolbarButton(bar, "📋", 0.9f) { toggleClipboard() }
             if (showingClipboard) clipBtn.setTextColor(accentColor())
             addToolbarButton(bar, "▣", 0.85f) { copyCurrentText() }
-            addToolbarButton(bar, "▤", 0.85f) { trackedClipboardAction(paste = true) }
+                addToolbarButton(bar, "📥", 0.85f) { trackedClipboardAction(paste = true) }
             addToolbarButton(bar, "⌫", 0.9f) { deleteCurrentFieldOrSelection() }
             val mic = addToolbarButton(bar, "🎙", 0.85f) { toggleVoice() }
             styleMic(mic)
