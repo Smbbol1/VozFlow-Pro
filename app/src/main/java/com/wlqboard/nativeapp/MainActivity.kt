@@ -381,16 +381,21 @@ class MainActivity : Activity() {
         header.addView(text(icon, 20, false), LinearLayout.LayoutParams(dp(38), dp(54)))
         header.addView(text(title, 16, true), LinearLayout.LayoutParams(0, dp(54), 1f))
         header.addView(text("⌄", 20, false, muted))
-        val inside = LinearLayout(this).apply {
+                val inside = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(16), 0, dp(16), dp(14))
-            visibility = View.GONE
+            visibility = if (expandedSectionTitle == title) View.VISIBLE else View.GONE
         }
         activeSection = inside
         inside.body()
         activeSection = null
-        header.setOnClickListener { inside.visibility = if (inside.visibility == View.VISIBLE) View.GONE else View.VISIBLE }
+        header.setOnClickListener {
+            val opening = inside.visibility != View.VISIBLE
+            inside.visibility = if (opening) View.VISIBLE else View.GONE
+            expandedSectionTitle = if (opening) title else null
+        }
         outer.addView(header)
+
         outer.addView(inside)
         content.addView(outer, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(10) })
     }
