@@ -845,11 +845,12 @@ class VozFlowIME : InputMethodService() {
         }
     }
 
-    private fun rebuildToolbar() {
+        private fun rebuildToolbar() {
         val bar = toolbar ?: return
         bar.removeAllViews()
-        bar.setBackgroundColor(backgroundColor())
+        bar.setBackgroundColor(if (floatingMode) Color.TRANSPARENT else backgroundColor())
         suggestionBar?.visibility = View.GONE
+
         val token = currentToken()
         val hasNextWordContext = token.isEmpty() && currentInputConnection?.getTextBeforeCursor(80, 0)?.toString()?.let { it.isNotBlank() && it.lastOrNull()?.isWhitespace() == true } == true
         val suggestionsOn = !passwordField && prefs.getBoolean("suggestions", true) && !listening && (token.isNotEmpty() || hasNextWordContext)
