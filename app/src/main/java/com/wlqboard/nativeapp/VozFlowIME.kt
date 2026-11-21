@@ -1153,10 +1153,11 @@ class VozFlowIME : InputMethodService() {
         if (showPeriod) {
             row.addView(makeKey(".", KeyKind.PERIOD, "."), keyLayout(scaledSideWeight(0.80f), true))
         }
-        if (showEnter || !anyVisible) {
+                if (showEnter || !anyVisible) {
             row.addView(makeKey(actionLabel(), KeyKind.ACTION, ""), keyLayout(scaledSideWeight(1.20f), true))
         }
-        parent.addView(row, rowLayout())
+        val bottomWeight = prefs.getInt("bottom_row_height_percent", 100).coerceIn(100, 220) / 100f
+        parent.addView(row, rowLayout(bottomWeight))
     }
 
 
