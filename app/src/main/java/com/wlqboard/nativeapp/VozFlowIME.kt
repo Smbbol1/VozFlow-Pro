@@ -1506,10 +1506,12 @@ class VozFlowIME : InputMethodService() {
             }
         }
 
-        if (shouldUpdateSuggestions) {
+                if (shouldUpdateSuggestions) {
+            toolbarToolsExpanded = false
             rebuildToolbar()
         }
     }
+
 
     private fun deleteOne() = deleteOneTracked()
 
