@@ -506,11 +506,12 @@ class VoiceDictationController(
         (0 until array.length()).map { array.optString(it) }.filter(String::isNotBlank)
     } catch (_: Exception) { emptyList() }
 
-        private fun capitalizeAfterPeriods(text: String): String {
+            private fun capitalizeAfterPeriods(text: String): String {
         return CAPITALIZE_PERIOD_REGEX.replace(text) { match ->
-            match.groupValues + match.groupValues.uppercase(SPANISH_LOCALE)
+            match.groupValues[1] + match.groupValues[2].uppercase(SPANISH_LOCALE)
         }
     }
+
 
     private fun capitalizeFirstLetter(text: String): String {
         val index = text.indexOfFirst { it.isLetter() }
