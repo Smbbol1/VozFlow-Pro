@@ -75,13 +75,15 @@ class VoiceDictationController(
                 onState(false, "Permiso de micrófono requerido")
                 return
             }
-            running = true
-            onState(true, "Preparando dictado offline…")
+                        running = true
+            onState(true, "Escuchando…")
             val thread = Thread({ runSession() }, "offline-voice-dictation")
+            thread.priority = Thread.MAX_PRIORITY
             worker = thread
             thread.start()
         }
     }
+
 
     /** Stops capture immediately; the worker finalizes any recognized utterance. */
     fun stop() {
