@@ -1528,10 +1528,14 @@ class VozFlowIME : InputMethodService() {
             }
         }
 
-                        if (shouldUpdateSuggestions) {
+                                if (shouldUpdateSuggestions) {
             toolbarToolsExpanded = false
             main.removeCallbacks(updateToolbarRunnable)
-            main.postDelayed(updateToolbarRunnable, 65L)
+            if (prefs.getBoolean("turbo_typing", true)) {
+                main.postDelayed(updateToolbarRunnable, 70L)
+            } else {
+                rebuildToolbar()
+            }
         }
     }
 
