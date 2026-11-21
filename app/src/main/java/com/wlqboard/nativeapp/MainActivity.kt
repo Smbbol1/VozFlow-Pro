@@ -118,11 +118,13 @@ class MainActivity : Activity() {
             addToggle("Vibración háptica al pulsar", "haptics", true)
             addToggle("Vista previa de letra", "key_preview", true)
 
-            text("Fila inferior (tamaño y teclas visibles)", 14, true).also {
+                        text("Fila inferior (tamaño y teclas visibles)", 14, true).also {
                 addView(it, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10); bottomMargin = dp(4) })
             }
+            addSeek("Altura de la fila inferior", "bottom_row_height_percent", 100, 220, 100, "%")
             addSeek("Ancho de barra espaciadora", "space_bar_weight", 15, 65, 38, "%")
             addToggle("Mostrar tecla ?123 / ABC", "bottom_key_symbols", true)
+
             addToggle("Mostrar tecla coma (, / /)", "bottom_key_comma", true)
             addToggle("Mostrar tecla emoji (☺)", "bottom_key_emoji", true)
             addToggle("Mostrar tecla símbolo libre (@)", "bottom_key_free_symbol", true)
