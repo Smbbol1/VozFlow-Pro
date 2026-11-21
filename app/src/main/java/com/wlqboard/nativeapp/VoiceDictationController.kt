@@ -560,8 +560,25 @@ class VoiceDictationController(
         private const val DEFAULT_AUTO_CAP_PAUSE_MS = 3_000
         private const val DEFAULT_SILENCE_TIMEOUT_MS = 3_500L
         private const val VOICE_RMS_THRESHOLD = 0.008
-        private const val AMPLITUDE_FULL_SCALE_RMS = 0.20
+                private const val AMPLITUDE_FULL_SCALE_RMS = 0.20
         private const val AMPLITUDE_CALLBACK_INTERVAL_MS = 50L
+        private val SPANISH_LOCALE = Locale("es", "ES")
+        private val DELETE_LAST_WORD_REGEX = Regex("\\bborrar última palabra\\b", RegexOption.IGNORE_CASE)
+        private val SPACE_BEFORE_PUNCT_REGEX = Regex("\\s+([,?.!;:])")
+        private val SPACE_AFTER_PUNCT_REGEX = Regex("([,?.!;:])(?=\\S)")
+        private val CAPITALIZE_PERIOD_REGEX = Regex("(^|[.!?]\\s+|\\n)([\\p{L}])")
+        private val COMMAND_REPLACEMENTS = listOf(
+            Regex("\\b(?:nuevo párrafo|nuevo parrafo)\\b", RegexOption.IGNORE_CASE) to "\n\n",
+            Regex("\\b(?:nueva línea|salto de línea)\\b", RegexOption.IGNORE_CASE) to "\n",
+            Regex("\\babre interrogación\\b", RegexOption.IGNORE_CASE) to "¿",
+            Regex("\\bcierra interrogación\\b", RegexOption.IGNORE_CASE) to "?",
+            Regex("\\bsigno de interrogación\\b", RegexOption.IGNORE_CASE) to "?",
+            Regex("\\binterrogación\\b", RegexOption.IGNORE_CASE) to "?",
+            Regex("\\bcoma\\b", RegexOption.IGNORE_CASE) to ",",
+            Regex("\\bdos puntos\\b", RegexOption.IGNORE_CASE) to ":",
+            Regex("\\bpunto\\b", RegexOption.IGNORE_CASE) to "."
+        )
     }
 }
+
 
