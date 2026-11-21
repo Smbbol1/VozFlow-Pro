@@ -506,17 +506,18 @@ class VoiceDictationController(
         (0 until array.length()).map { array.optString(it) }.filter(String::isNotBlank)
     } catch (_: Exception) { emptyList() }
 
-    private fun capitalizeAfterPeriods(text: String): String {
-        return Regex("(^|[.!?]\\s+|\\n)([\\p{L}])").replace(text) { match ->
-            match.groupValues[1] + match.groupValues[2].uppercase(Locale.getDefault())
+        private fun capitalizeAfterPeriods(text: String): String {
+        return CAPITALIZE_PERIOD_REGEX.replace(text) { match ->
+            match.groupValues + match.groupValues.uppercase(SPANISH_LOCALE)
         }
     }
 
     private fun capitalizeFirstLetter(text: String): String {
         val index = text.indexOfFirst { it.isLetter() }
         if (index < 0) return text
-        return text.substring(0, index) + text[index].uppercase(Locale.getDefault()) + text.substring(index + 1)
+        return text.substring(0, index) + text[index].uppercase(SPANISH_LOCALE) + text.substring(index + 1)
     }
+
 
     private fun extractText(json: String, key: String): String {
         return try {
