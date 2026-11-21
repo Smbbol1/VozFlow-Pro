@@ -717,11 +717,12 @@ class VozFlowIME : InputMethodService() {
 
     override fun onComputeInsets(outInsets: Insets) {
 
-        super.onComputeInsets(outInsets)
+                super.onComputeInsets(outInsets)
         try {
-            val decor = getWindow().window?.decorView
+            val decor = window?.window?.decorView
             val host = root
             val card = keyboardCard
+
             if (floatingMode && host != null && card != null) {
                 val rect = Rect()
                 val location = IntArray(2)
