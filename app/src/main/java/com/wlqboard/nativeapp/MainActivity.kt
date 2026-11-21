@@ -115,12 +115,14 @@ class MainActivity : Activity() {
             addToggle("Modo dedos grandes / Evitar errores de pulsación", "big_keys_enabled", false)
             addSeek("Ampliación de teclas", "big_keys_scale", 100, 150, 120, "%")
             addSeek("Sensibilidad táctil", "touch_sensitivity", 1, 10, 5, " / 10")
-                        addOneHandSelector()
+                                    addOneHandSelector()
+            addToggle("Modo agilidad / Respuesta instantánea", "turbo_typing", true)
             addToggle("Fila de números superior", "number_row", true)
             addToggle("Vibración háptica al pulsar", "haptics", true)
             addToggle("Vista previa de letra", "key_preview", true)
 
-                        text("Fila inferior (tamaño y teclas visibles)", 14, true).also {
+            text("Fila inferior (tamaño y teclas visibles)", 14, true).also {
+
                 addView(it, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10); bottomMargin = dp(4) })
             }
             addSeek("Altura de la fila inferior", "bottom_row_height_percent", 100, 220, 100, "%")
