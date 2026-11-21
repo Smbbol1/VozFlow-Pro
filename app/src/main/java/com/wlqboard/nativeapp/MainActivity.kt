@@ -33,11 +33,13 @@ import org.json.JSONObject
 import kotlin.math.log10
 
 class MainActivity : Activity() {
-    private lateinit var prefs: SharedPreferences
+        private lateinit var prefs: SharedPreferences
     private lateinit var content: LinearLayout
     private var activeSection: LinearLayout? = null
+    private var expandedSectionTitle: String? = null
     private var trainingController: VoiceDictationController? = null
     private val bg = Color.rgb(26, 25, 24)
+
     private val card = Color.rgb(37, 34, 32)
     private val bone = Color.rgb(234, 230, 225)
     private val muted = Color.rgb(180, 172, 164)
