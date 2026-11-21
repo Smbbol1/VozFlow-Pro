@@ -1544,16 +1544,13 @@ class VozFlowIME : InputMethodService() {
             }
         }
 
-                                if (shouldUpdateSuggestions) {
+                                        if (shouldUpdateSuggestions) {
             toolbarToolsExpanded = false
             main.removeCallbacks(updateToolbarRunnable)
-            if (prefs.getBoolean("turbo_typing", true)) {
-                main.postDelayed(updateToolbarRunnable, 70L)
-            } else {
-                rebuildToolbar()
-            }
+            main.postDelayed(updateToolbarRunnable, 140L)
         }
     }
+
 
     private val updateToolbarRunnable = Runnable {
         if (root != null && !listening) rebuildToolbar()
