@@ -456,11 +456,15 @@ class MainActivity : Activity() {
             textSize = 14f
             setTextColor(bone)
             isChecked = prefs.getBoolean(key, default)
-            setOnCheckedChangeListener { _, checked -> prefs.edit().putBoolean(key, checked).apply() }
+                        setOnCheckedChangeListener { _, checked -> prefs.edit().putBoolean(key, checked).apply() }
             minHeight = dp(48)
-            thumbTintList = android.content.res.ColorStateList.valueOf(if (isChecked) Color.rgb(216, 167, 106) else Color.LTGRAY)
+            thumbTintList = android.content.res.ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                intArrayOf(Color.rgb(216, 167, 106), Color.LTGRAY)
+            )
             trackTintList = android.content.res.ColorStateList.valueOf(Color.rgb(90, 78, 68))
         }
+
         activeSection?.addView(toggle, LinearLayout.LayoutParams(-1, -2))
     }
 
