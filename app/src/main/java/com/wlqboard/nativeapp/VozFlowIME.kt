@@ -1058,7 +1058,9 @@ class VozFlowIME : InputMethodService() {
                 val view = makeKey(key, if (key == "⌫") KeyKind.DELETE else KeyKind.CHAR, key)
                 row.addView(view, keyLayout(1f, key == "⌫"))
             }
-            parent.addView(row, LinearLayout.LayoutParams(-1, 0, if (index == 3) 1.05f else 1f).apply { topMargin = dp(3); bottomMargin = dp(3) })
+                        val vGap = prefs.getInt("key_spacing_v", 6).coerceIn(0, 16)
+            val halfV = dp(vGap) / 2
+            parent.addView(row, LinearLayout.LayoutParams(-1, 0, if (index == 3) 1.05f else 1f).apply { topMargin = halfV; bottomMargin = halfV })
         }
     }
 
