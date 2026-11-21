@@ -72,15 +72,24 @@ class ClipboardStore(context: Context) : SQLiteOpenHelper(context.applicationCon
         writableDatabase.execSQL("UPDATE clipboard_items SET is_pinned=? WHERE id=?", arrayOf(if (pinned) 1 else 0, id))
     }
 
-    @Synchronized
+        @Synchronized
     fun updateText(id: Long, text: String) {
         val value = text.trim()
         if (value.isEmpty()) return
-        writableDatabase.execSQL("UPDATE clipboard_items SET payload=?,is_image=0,created_at=? WHERE id=?", arrayOf<Any>(value, System.currentTimeMillis(), id))
+        val db = writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete("clipboard_items", "payload=? AND id!=?", arrayOf(value, id.toString()))
+            db.execSQL("UPDATE clipboard_items SET payload=?,is_image=0,created_at=? WHERE id=?", arrayOf<Any>(value, System.currentTimeMillis(), id))
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
     }
 
     @Synchronized
     fun remove(id: Long) { writableDatabase.delete("clipboard_items", "id=?", arrayOf(id.toString())) }
+
 
     @Synchronized
     fun remove(ids: Collection<Long>) {
